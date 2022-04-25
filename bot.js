@@ -18,6 +18,7 @@ stage.register(subscribe, hashrate, home);
 
 bot.use(session());
 bot.use(stage.middleware());
+bot.use(require('./src/composers/api.composer'));
 
 bot.start((ctx) =>{
   if (ctx.from.id != settings.adminId && ctx.chat.type =='group'){
