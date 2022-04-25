@@ -20,10 +20,6 @@ const subscribe = new Scenes.WizardScene(
 );
   //Регистрация подписчика
   subscribe.action('subscrcribe', (ctx)=>{
-    if (ctx.from.id != settings.adminId && ctx.chat.type =='group'){
-      ctx.reply('У Вас недостаточно прав для выполнения этой команды');
-      return; 
-    }
     let id = ctx.chat.id;
     let index = chatIdes.indexOf(id);
     if (index ==-1){
@@ -32,21 +28,15 @@ const subscribe = new Scenes.WizardScene(
       chatIdes.push(id);
       console.log("All users id: ", chatIdes); 
       fs.writeFileSync('src/controls/chatId.json', JSON.stringify(chatIdes));
-      ctx.reply('Вы подписались на оповещение Ethсore pool bot');
-      monitor.start();
-                
+      ctx.reply('Вы подписались на оповещение Ethсore pool bot', Markup.inlineKeyboard([
+        Markup.button.callback('Назад', 'back')]));
     } 
-      else ctx.reply('Вы уже подписаны на оповещение Ethсore pool bot');
-      ctx.scene.leave();
+      else ctx.reply('Вы уже подписаны на оповещение Ethсore pool bot', Markup.inlineKeyboard([
+        Markup.button.callback('Назад', 'back')]));
     
   });
   //Удаление подписчика
   subscribe.action('unsubscribe', (ctx)=> {
-    if (ctx.from.id != settings.adminId && ctx.chat.type =='group'){
-      ctx.reply('У Вас недостаточно прав для выполнения этой команды');
-      return; 
-    }
-
     let id = ctx.chat.id;
     let index = chatIdes.indexOf(id);
     if (index !==-1){
@@ -55,11 +45,11 @@ const subscribe = new Scenes.WizardScene(
         chatIdes.splice(index, 1);
         console.log("All users id: ", chatIdes); 
         fs.writeFileSync('src/controls/chatId.json', JSON.stringify(chatIdes)); 
-        ctx.reply('Вы отписались от оповещения Ethсore pool bot');
-        monitor.start(); 
+        ctx.reply('Вы отписались от оповещения Ethсore pool bot', Markup.inlineKeyboard([
+          Markup.button.callback('Назад', 'back')]));
       } 
-      else ctx.reply('Вы уже отписались от оповещения Ethсore pool bot'); 
-      ctx.scene.leave();
+      else ctx.reply('Вы уже отписались от оповещения Ethсore pool bot', Markup.inlineKeyboard([
+        Markup.button.callback('Назад', 'back')]));
       
   });
     

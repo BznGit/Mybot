@@ -3,21 +3,42 @@ const chatIdes = require('../controls/chatId.json');
 const monit = require('../controls/apiControls');
 const monitor = new monit();
 const {WizardScene, Scenes, Markup} = require("telegraf");
+
 // Сцена создания нового матча.
 const hashrate = new Scenes.WizardScene(
     "hashMenu", // Имя сцены
+    async (ctx) => {
+      await ctx.reply('Введите кошелек');
+      ctx.wizard.next() ;
+      //return ctx.wizard.steps[ctx.wizard.cursor](ctx); // Переходим к следующему обработчику.
+    },
+    async (ctx) => {
+      ctx.reply('Этап 2: выбор времени проведения матча.');
+      await  ctx.wizard.next(); 
+      return ctx.wizard.steps[ctx.wizard.cursor](ctx); // Переходим к следующему обработчику.
+    },
     (ctx) => {
-      return ctx.reply('Подписка на оповещение о текущем хэшрейте:', {
-        parse_mode: 'HTML',
-        ...Markup.inlineKeyboard([
-          Markup.button.callback('Подписаться', 'subscrcribeHash'),
-          Markup.button.callback('Отписаться', 'unsubscribeHash'),
-          Markup.button.callback('Назад', 'back')
-        ])
-      })
-    }
+      ctx.reply('Этап 3: выбор времени проведения матча.');
+        ctx.wizard.back(); // Вернуться к предыдущиму обработчику
+      
+      ctx.reply('Этап 3: выбор места проведения матча.');
+      return ctx.wizard.next(); // Переходим к следующему обработчику.
+    },
 );
-  
+
+
+hashrate.action('setHash', (ctx)=>{
+  return ctx.reply('Введите пороговый уровень хешрейта:', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      Markup.button.callback('Далее', 'subscrcribeHash'),
+      Markup.button.callback('Отписаться', 'unsubscribeHash'),
+      Markup.button.callback('Назад', 'back')
+    ])
+  })
+});
+
+
 hashrate.action('subscrcribeHash', (ctx)=>{
   ctx.reply('Введите пороговый уровень хешрейта: ')
   let id = ctx.chat.id;
