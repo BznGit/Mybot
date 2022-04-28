@@ -2,28 +2,21 @@ const fs = require('fs');
 const chatIdes = require('../controls/chatId.json');
 const monit = require('../controls/apiControls');
 const monitor = new monit();
-const {WizardScene, Scenes, Markup} = require("telegraf");
+const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.
 const hashrate = new Scenes.WizardScene(
     "hashMenu", // Имя сцены
     async (ctx) => {
-      await ctx.reply('Введите кошелек');
-      ctx.wizard.next() ;
+      await ctx.reply('Введите кошелек:');
+      return ctx.wizard.next() ;
       //return ctx.wizard.steps[ctx.wizard.cursor](ctx); // Переходим к следующему обработчику.
     },
     async (ctx) => {
-      ctx.reply('Этап 2: выбор времени проведения матча.');
-      await  ctx.wizard.next(); 
-      return ctx.wizard.steps[ctx.wizard.cursor](ctx); // Переходим к следующему обработчику.
+      await ctx.reply('Введите воркер:');
+      return ctx.wizard.next(); 
     },
-    (ctx) => {
-      ctx.reply('Этап 3: выбор времени проведения матча.');
-        ctx.wizard.back(); // Вернуться к предыдущиму обработчику
-      
-      ctx.reply('Этап 3: выбор места проведения матча.');
-      return ctx.wizard.next(); // Переходим к следующему обработчику.
-    },
+    
 );
 
 
