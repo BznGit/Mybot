@@ -8,7 +8,7 @@ const { Scenes, Markup } = require("telegraf");
 const hashrate = new Scenes.WizardScene(
     "hashMenu", // Имя сцены
      (ctx) => {
-      ctx.reply('Введите пороговый уровень хешрейта:', {
+      ctx.reply('Выберите монету:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
           Markup.button.callback ('Ethereum','chooseEth'),
@@ -24,11 +24,25 @@ const hashrate = new Scenes.WizardScene(
     }, 
     (ctx) => {
       ctx.wizard.state.worker =  ctx.message.text;
-      ctx.reply('Ваши данные:\n'+ 
-      'Монета:' + ctx.wizard.state.poolId+'\n'+
-      'Кошелек:' + ctx.wizard.state.wallet+'\n'+
-      'Воркер:' + ctx.wizard.state.worker+'\n');
-      return ctx.wizard.leave();
+      ctx.reply('Выберите размерность критического уровня хашрейта:', {
+        parse_mode: 'HTML',
+        ...Markup.inlineKeyboard([
+          Markup.button.callback ('MH/s','chooseM'),
+          Markup.button.callback ('GH/s','chooseG'),
+          Markup.button.callback('TH/s', 'chooseT'),        
+        ])    
+      })
+      return ctx.wizard.next(); 
+    },     
+
+    (ctx) => {
+      ctx.wizard.state.hash =  ctx.message.text;
+      ctx.reply('<b>Ваши данные:</b>\n'+ 
+      'Монета: '  + ctx.wizard.state.poolId + '\n' +
+      'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
+      'Воркер: '  + ctx.wizard.state.worker + '\n' +
+      'Критичекий  уровень: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash, {parse_mode: 'HTML'});
+      ctx.scene.enter("home") 
     }, 
 
    
@@ -41,7 +55,19 @@ hashrate.action('chooseEth', (ctx)=>{
 hashrate.action('chooseErgo',  (ctx)=>{
   ctx.wizard.state.poolId = 'ergopool'
   ctx.reply('Введите кошелек:');
- 
+});
+
+hashrate.action('chooseM',  (ctx)=>{
+  ctx.wizard.state.defHash = 'MH/s'
+  ctx.reply('Введите значение критического уровня хашрейта:');
+});
+hashrate.action('chooseG',  (ctx)=>{
+  ctx.wizard.state.defHash = 'GH/s'
+  ctx.reply('Введите значение критического уровня хашрейта:');
+});
+hashrate.action('chooseT',  (ctx)=>{
+  ctx.wizard.state.defHash = 'TH/s'
+  ctx.reply('Введите значение критического уровня хашрейта:');
 });
 
 
