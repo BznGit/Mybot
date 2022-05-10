@@ -7,17 +7,42 @@ const { Scenes, Markup } = require("telegraf");
 // Сцена создания нового матча.
 const hashrate = new Scenes.WizardScene(
     "hashMenu", // Имя сцены
-    async (ctx) => {
-      await ctx.reply('Введите кошелек:');
-      return ctx.wizard.next() ;
-      //return ctx.wizard.steps[ctx.wizard.cursor](ctx); // Переходим к следующему обработчику.
-    },
-    async (ctx) => {
-      await ctx.reply('Введите воркер:');
+     (ctx) => {
+      ctx.reply('Введите пороговый уровень хешрейта:', {
+        parse_mode: 'HTML',
+        ...Markup.inlineKeyboard([
+          Markup.button.callback ('Ethereum','chooseEth'),
+          Markup.button.callback('Ergo', 'chooseErgo'),        
+        ])    
+      })
       return ctx.wizard.next(); 
-    },
-    
+    },     
+    (ctx) => {
+      ctx.wizard.state.wallet =  ctx.message.text;
+      ctx.reply('Введите воркер:');
+      return ctx.wizard.next(); 
+    }, 
+    (ctx) => {
+      ctx.wizard.state.worker =  ctx.message.text;
+      ctx.reply('Ваши данные:\n'+ 
+      'Монета:' + ctx.wizard.state.poolId+'\n'+
+      'Кошелек:' + ctx.wizard.state.wallet+'\n'+
+      'Воркер:' + ctx.wizard.state.worker+'\n');
+      return ctx.wizard.leave();
+    }, 
+
+   
 );
+hashrate.action('chooseEth', (ctx)=>{
+  ctx.wizard.state.poolId = 'ethpool'
+  ctx.reply('Введите кошелек:'); 
+});
+
+hashrate.action('chooseErgo',  (ctx)=>{
+  ctx.wizard.state.poolId = 'ergopool'
+  ctx.reply('Введите кошелек:');
+ 
+});
 
 
 hashrate.action('setHash', (ctx)=>{
@@ -30,7 +55,6 @@ hashrate.action('setHash', (ctx)=>{
     ])
   })
 });
-
 
 hashrate.action('subscrcribeHash', (ctx)=>{
   ctx.reply('Введите пороговый уровень хешрейта: ')
@@ -53,7 +77,7 @@ hashrate.action('unsubscribe', (ctx)=> {
   let index = chatIdes.indexOf(id);
   if (index !==-1){
       monitor.stop();
-      console.log('deleted:=> id: '+id +'-'+ ctx.chat.first_name);
+      console.log('deleted:=> id: '+id +'-'+ ctx.chat.first_name);  
       chatIdes.splice(index, 1);
       console.log("All users id: ", chatIdes); 
       fs.writeFileSync('src/controls/chatId.json', JSON.stringify(chatIdes)); 
