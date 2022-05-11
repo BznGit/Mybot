@@ -35,7 +35,7 @@ const hashrate = new Scenes.WizardScene(
         let wrk= Object.keys(response.data.performance.workers);
         ctx.reply('Ваши воркеры: ' + wrk);
         ctx.reply('Выберите нужный в правом меню ⤵️', Markup.keyboard(wrk).oneTime().resize())
-        ctx.replyWithPhoto({ source: '/src/cat1.jpeg' })
+        ctx.replyWithPhoto({ source: '/src/buttons.png' })
         return ctx.wizard.next();        
          
       }).catch(function (error) {
