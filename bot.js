@@ -1,7 +1,7 @@
 const settings = require('./botSettings.json');
 const { Telegraf, Scenes, session, Markup, Extra} = require('telegraf');
 const bot = new Telegraf(settings.telegramBotToken);
-
+const axios = require('axios');
 const home = require('./src/scense/homeScene');
 const subscribe = require('./src/scense/blockScene');
 const hashrate = require('./src/scense/hashScene');

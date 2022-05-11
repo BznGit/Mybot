@@ -1,4 +1,8 @@
 const fs = require('fs');
+const axios = require('axios');
+const settings = require('../../botSettings.json');
+const api = settings.MiningCoreApiEndpoints;
+
 const chatIdes = require('../controls/chatId.json');
 const monit = require('../controls/apiControls');
 const monitor = new monit();
@@ -18,17 +22,39 @@ const hashrate = new Scenes.WizardScene(
       return ctx.wizard.next(); 
     },     
     (ctx) => {
-      ctx.wizard.state.wallet =  ctx.message.text;
-      ctx.reply('Введите воркер:');
-      return ctx.wizard.next(); 
+       axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text)
+      .then((response)=> {
+        // handle success
+        console.log(response.data.performance);
+        if (response.data.performance == undefined){
+          ctx.reply('Такого кошелька нет!');
+          ctx.reply('Введите кошелек заново');
+          return
+        }
+        ctx.wizard.state.wallet =  ctx.message.text;
+        let wrk= Object.keys(response.data.performance.workers);
+        ctx.reply('Ваши воркеры: ' + wrk);
+        ctx.reply('Выберите нужный в правом меню ⤵️', Markup.keyboard(wrk).oneTime().resize())
+        
+        return ctx.wizard.next();        
+         
+      }).catch(function (error) {
+        // handle error
+        console.log(error);
+        ctx.reply('Ошибка проверки');
+        return
+      })
+     
+      
     }, 
     (ctx) => {
+
       ctx.wizard.state.worker =  ctx.message.text;
-      ctx.reply('Выберите размерность критического уровня хашрейта:', {
+      ctx.reply('Выберите размерность граничного уровня хешрейта:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
-          Markup.button.callback ('MH/s','chooseM'),
-          Markup.button.callback ('GH/s','chooseG'),
+          Markup.button.callback('MH/s', 'chooseM'),
+          Markup.button.callback('GH/s', 'chooseG'),
           Markup.button.callback('TH/s', 'chooseT'),        
         ])    
       })
@@ -36,12 +62,18 @@ const hashrate = new Scenes.WizardScene(
     },     
 
     (ctx) => {
+      let regexp = /[0-9]/;
+      if(!regexp.test(ctx.message.text)){
+        ctx.reply('введите число!');
+        return 
+      } 
       ctx.wizard.state.hash =  ctx.message.text;
+      
       ctx.reply('<b>Ваши данные:</b>\n'+ 
       'Монета: '  + ctx.wizard.state.poolId + '\n' +
       'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
       'Воркер: '  + ctx.wizard.state.worker + '\n' +
-      'Критичекий  уровень: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash, {parse_mode: 'HTML'});
+      'Граничнй  уровень: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash, {parse_mode: 'HTML'});
       ctx.scene.enter("home") 
     }, 
 

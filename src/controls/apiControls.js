@@ -1,5 +1,5 @@
 //Опрос API и  оповщение
-const axios = require('axios');
+
 const settings = require('../../botSettings.json');
 const api = settings.MiningCoreApiEndpoints +'/api/pools/ethpool/blocks';
 var chatIdes=null;
