@@ -20,14 +20,14 @@ bot.use(session());
 bot.use(stage.middleware());
 bot.use(require('./src/composers/api.composer'));
 
+
 bot.start((ctx) =>{
   if (ctx.from.id != settings.adminId && ctx.chat.type =='group'){
     ctx.reply('У Вас недостаточно прав для выполнения этой команды');
     return; 
   }
-  ctx.scene.enter("home")
+  ctx.scene.enter("homeScene")
 })
-
 
 // Запуск бота
 bot.launch();
