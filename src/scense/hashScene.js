@@ -10,9 +10,7 @@ const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.
 const hashrate = new Scenes.WizardScene(
-
     "hashScene", // Имя сцены
-
      (ctx) => {
       ctx.reply('Выберите монету:', {
         parse_mode: 'HTML',
@@ -72,10 +70,12 @@ const hashrate = new Scenes.WizardScene(
       ctx.wizard.state.hash =  ctx.message.text;
       
       ctx.reply('<b>Ваши данные:</b>\n'+ 
-      'Монета: '  + ctx.wizard.state.poolId + '\n' +
-      'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
-      'Воркер: '  + ctx.wizard.state.worker + '\n' +
-      'Граничнй  уровень: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash, {parse_mode: 'HTML'});
+        'Монета: '  + ctx.wizard.state.poolId + '\n' +
+        'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
+        'Воркер: '  + ctx.wizard.state.worker + '\n' +
+        'Граничнй  уровень: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash,
+        {parse_mode: 'HTML'}
+      );
       ctx.reply('Подписаться?', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
@@ -129,7 +129,8 @@ hashrate.action('subHash', (ctx)=>{
     wallet : ctx.wizard.state.wallet,
     worker : ctx.wizard.state.worker,
     levelHash : ctx.wizard.state.hash,
-    defHash : ctx.wizard.state.defHash
+    defHash : ctx.wizard.state.defHash,
+    block : false,
   };
   
   let obj = users.find(item=>item.userId==ctx.chat.id);
@@ -141,26 +142,12 @@ hashrate.action('subHash', (ctx)=>{
     console.log("All users id: ", users); 
     fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
     ctx.reply('Вы подписались на оповещение о хешрейте');
-    return ctx.scene.enter("home")  
+    return ctx.scene.enter("homeScene")  
   } 
     else ctx.reply('Вы уже подписаны на оповещение о хешрейте');
     return ctx.scene.enter("homeScene")  
 });
   
-hashrate.action('unsubscribe', (ctx)=> {
-  let id = ctx.chat.id;
-  let index = chatIdes.indexOf(id);
-  if (index !==-1){
-      monitor.stop();
-      console.log('deleted:=> id: '+id +'-'+ ctx.chat.first_name);  
-      chatIdes.splice(index, 1);
-      console.log("All users id: ", chatIdes); 
-      fs.writeFileSync('src/controls/chatId.json', JSON.stringify(chatIdes)); 
-      ctx.reply('Вы отписались от оповещения Ethсore pool bot');
-      
-    } 
-    else ctx.reply('Вы уже отписались от оповещения Ethсore pool bot'); 
-});
   
 hashrate.action('back', (ctx)=> {
   ctx.scene.leave();
