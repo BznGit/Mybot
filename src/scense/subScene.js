@@ -2,15 +2,14 @@ const fs = require('fs');
 const axios = require('axios');
 const settings = require('../../botSettings.json');
 const api = settings.MiningCoreApiEndpoints;
-
 const users = require('../controls/users.json');
 const monit = require('../controls/apiControls');
 const monitor = new monit();
 const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.
-const hashrate = new Scenes.WizardScene(
-    "hashScene", // Имя сцены
+const subscribe = new Scenes.WizardScene(
+    "subScene", // Имя сцены
      (ctx) => {
       ctx.reply('Выберите монету:', {
         parse_mode: 'HTML',
@@ -20,9 +19,9 @@ const hashrate = new Scenes.WizardScene(
         ])    
       })
       return ctx.wizard.next(); 
-    },     
+    },
+    
     (ctx) => {
-     // console.log(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text);
        axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text)
       .then((response)=> {
         // handle success
@@ -43,9 +42,7 @@ const hashrate = new Scenes.WizardScene(
         console.log(error);
         ctx.reply('Введены неверные данные попробуйте еще раз!');
         return
-      })
-     
-      
+      })    
     }, 
     (ctx) => {
 
@@ -71,9 +68,10 @@ const hashrate = new Scenes.WizardScene(
       
       ctx.reply('<b>Ваши данные:</b>\n'+ 
         'Монета: '  + ctx.wizard.state.poolId + '\n' +
+        'Оповещение о блоке: '  + ctx.wizard.state.poolId + '\n' +
         'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
         'Воркер: '  + ctx.wizard.state.worker + '\n' +
-        'Граничнй  уровень: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash,
+        'Оповещение обровене хешрейта: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash,
         {parse_mode: 'HTML'}
       );
       ctx.reply('Подписаться?', {
@@ -82,36 +80,66 @@ const hashrate = new Scenes.WizardScene(
           Markup.button.callback('Да', 'subHash'),
           Markup.button.callback('Нет', 'back')
         ])
-      })
-      
+      })   
     }, 
-   
-   
 );
-hashrate.action('chooseEth', (ctx)=>{
-  ctx.wizard.state.poolId = 'ethpool'
-  ctx.reply('Введите ethereun кошелек:'); 
+subscribe.action('chooseEth', (ctx)=>{
+  ctx.wizard.state.poolId = 'ethpool';
+  ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      Markup.button.callback('Да', 'subBlockEth'),
+      Markup.button.callback('Нет', 'notSubBlockEth')
+    ])
+  }) 
+  
 });
 
-hashrate.action('chooseErgo',  (ctx)=>{
+subscribe.action('subBlockEth',  (ctx)=>{
+  ctx.wizard.state.block = 'да'
+  ctx.reply('Введите ethereum кошелек:');
+});
+
+subscribe.action('notSubBlockEth',  (ctx)=>{
+  ctx.wizard.state.block = 'нет'
+  ctx.reply('Введите ethereum кошелек:');
+});
+
+subscribe.action('chooseErgo',  (ctx)=>{
   ctx.wizard.state.poolId = 'ergopool'
+  ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      Markup.button.callback('Да', 'subBlockErgo'),
+      Markup.button.callback('Нет', 'notSubBlockErgo')
+    ])
+  }) 
+});
+
+subscribe.action('subBlockErgo',  (ctx)=>{
+  ctx.wizard.state.block = 'да'
   ctx.reply('Введите ergo кошелек:');
 });
 
-hashrate.action('chooseM',  (ctx)=>{
+subscribe.action('notSubBlockErgo',  (ctx)=>{
+  ctx.wizard.state.block = 'нет'
+  ctx.reply('Введите ergo кошелек:');
+});
+
+subscribe.action('chooseM',  (ctx)=>{
   ctx.wizard.state.defHash = 'MH/s'
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
-hashrate.action('chooseG',  (ctx)=>{
+subscribe.action('chooseG',  (ctx)=>{
   ctx.wizard.state.defHash = 'GH/s'
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
-hashrate.action('chooseT',  (ctx)=>{
+subscribe.action('chooseT',  (ctx)=>{
   ctx.wizard.state.defHash = 'TH/s'
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
 
-hashrate.action('setHash', (ctx)=>{
+subscribe.action('setHash', (ctx)=>{
   return ctx.reply('Введите пороговый уровень хешрейта:', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
@@ -122,7 +150,7 @@ hashrate.action('setHash', (ctx)=>{
   })
 });
 
-hashrate.action('subHash', (ctx)=>{
+subscribe.action('subHash', (ctx)=>{
   let curUser = {
     userId: ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
@@ -130,7 +158,7 @@ hashrate.action('subHash', (ctx)=>{
     worker : ctx.wizard.state.worker,
     levelHash : ctx.wizard.state.hash,
     defHash : ctx.wizard.state.defHash,
-    block : false,
+    block : ctx.wizard.state.block, 
   };
   
   console.log('Added user: ', curUser);
@@ -143,13 +171,13 @@ hashrate.action('subHash', (ctx)=>{
 });
   
   
-hashrate.action('back', (ctx)=> {
+subscribe.action('back', (ctx)=> {
   ctx.scene.leave();
   ctx.scene.enter("homeScene")  
 });
-hashrate.command('/back', (ctx) => ctx.scene.enter("homeScene"))
+subscribe.command('/back', (ctx) => ctx.scene.enter("homeScene"))
 
-module.exports = hashrate;
+module.exports = subscribe;
 
 
    
