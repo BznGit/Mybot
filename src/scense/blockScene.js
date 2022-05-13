@@ -1,12 +1,12 @@
 const fs = require('fs');
-const chatIdes = require('../controls/chatId.json');
+const chatIdes = require('../controls/users.json');
 const monit = require('../controls/apiControls');
 const settings = require('../../botSettings.json');
 const monitor = new monit();
 const {WizardScene, Scenes, Markup} = require("telegraf");
 // Сцена создания нового матча.
 const subscribe = new Scenes.WizardScene(
-    "subscrMenu", // Имя сцены
+    "blockScene", // Имя сцены
     (ctx) => {
       return ctx.reply('Подписка на оповещение о новом блоке:', {
         parse_mode: 'HTML',
@@ -55,7 +55,7 @@ const subscribe = new Scenes.WizardScene(
     
   subscribe.action('back', (ctx)=> {
     ctx.scene.leave();
-    ctx.scene.enter("home")
+    ctx.scene.enter("homeScene")
 
       
   });
