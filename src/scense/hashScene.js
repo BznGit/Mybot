@@ -10,6 +10,7 @@ const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.
 const hashrate = new Scenes.WizardScene(
+  
     "hashMenu", // Имя сцены
      (ctx) => {
       ctx.reply('Выберите монету:', {
