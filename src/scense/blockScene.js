@@ -1,5 +1,5 @@
 const fs = require('fs');
-const chatIdes = require('../controls/users.json');
+const users = require('../controls/users.json');
 const monit = require('../controls/apiControls');
 const settings = require('../../botSettings.json');
 const monitor = new monit();
@@ -7,50 +7,61 @@ const {WizardScene, Scenes, Markup} = require("telegraf");
 // Сцена создания нового матча.
 const subscribe = new Scenes.WizardScene(
     "blockScene", // Имя сцены
+    
     (ctx) => {
-      return ctx.reply('Подписка на оповещение о новом блоке:', {
+      ctx.reply('Выберите монету:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
-          Markup.button.callback('Подписаться', 'subscrcribe'),
-          Markup.button.callback('Отписаться', 'unsubscribe'),
-          Markup.button.callback('Назад', 'back')
-        ])
+          Markup.button.callback ('Ethereum','chooseEth'),
+          Markup.button.callback('Ergo', 'chooseErgo'),        
+        ])    
       })
+      
     }
+
 );
   //Регистрация подписчика
   subscribe.action('subscrcribe', (ctx)=>{
-    let id = ctx.chat.id;
-    let index = chatIdes.indexOf(id);
-    if (index ==-1){
-      monitor.stop();
-      console.log('Added:=> id: '+id +'-'+ ctx.chat.first_name);
-      chatIdes.push(id);
-      console.log("All users id: ", chatIdes); 
-      fs.writeFileSync('src/controls/chatId.json', JSON.stringify(chatIdes));
-      ctx.reply('Вы подписались на оповещение Ethсore pool bot', Markup.inlineKeyboard([
-        Markup.button.callback('Назад', 'back')]));
-    } 
-      else ctx.reply('Вы уже подписаны на оповещение Ethсore pool bot', Markup.inlineKeyboard([
-        Markup.button.callback('Назад', 'back')]));
+    let curUser = {
+      userId : ctx.chat.id,
+      poolId : ctx.wizard.state.poolId,
+      wallet : null,
+      worker : null,
+      levelHash : null,
+      defHash : null,
+      block : true,
+    };
+    
+    console.log('Added user: ', curUser);
+    users.push(curUser);
+    console.log("All users id: ", users); 
+    fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
+    ctx.reply('Вы подписались на оповещение о хешрейте');
+    return ctx.scene.enter("homeScene")  
     
   });
-  //Удаление подписчика
-  subscribe.action('unsubscribe', (ctx)=> {
-    let id = ctx.chat.id;
-    let index = chatIdes.indexOf(id);
-    if (index !==-1){
-        monitor.stop();
-        console.log('deleted:=> id: '+id +'-'+ ctx.chat.first_name);
-        chatIdes.splice(index, 1);
-        console.log("All users id: ", chatIdes); 
-        fs.writeFileSync('src/controls/chatId.json', JSON.stringify(chatIdes)); 
-        ctx.reply('Вы отписались от оповещения Ethсore pool bot', Markup.inlineKeyboard([
-          Markup.button.callback('Назад', 'back')]));
-      } 
-      else ctx.reply('Вы уже отписались от оповещения Ethсore pool bot', Markup.inlineKeyboard([
-        Markup.button.callback('Назад', 'back')]));
-      
+  
+  subscribe.action('chooseEth', (ctx)=>{
+    ctx.wizard.state.poolId = 'ethpool';
+    return ctx.reply('Подписка на оповещение о новом блоке:', {
+      parse_mode: 'HTML',
+      ...Markup.inlineKeyboard([
+        Markup.button.callback('Подписаться', 'subscrcribe'),
+        Markup.button.callback('Назад', 'back')
+      ])
+    })
+   
+  });
+  
+  subscribe.action('chooseErgo',  (ctx)=>{
+    ctx.wizard.state.poolId = 'ergopool'
+    return ctx.reply('Подписка на оповещение о новом блоке:', {
+      parse_mode: 'HTML',
+      ...Markup.inlineKeyboard([
+        Markup.button.callback('Подписаться', 'subscrcribe'),
+        Markup.button.callback('Назад', 'back')
+      ])
+    })
   });
     
   subscribe.action('back', (ctx)=> {

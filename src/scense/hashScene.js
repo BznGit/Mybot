@@ -133,19 +133,13 @@ hashrate.action('subHash', (ctx)=>{
     block : false,
   };
   
-  let obj = users.find(item=>item.userId==ctx.chat.id);
-  console.log('--->',obj)
-  if (obj==undefined){
-   
-    console.log('Added user: ', curUser);
-    users.push(curUser);
-    console.log("All users id: ", users); 
-    fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
-    ctx.reply('Вы подписались на оповещение о хешрейте');
-    return ctx.scene.enter("homeScene")  
-  } 
-    else ctx.reply('Вы уже подписаны на оповещение о хешрейте');
-    return ctx.scene.enter("homeScene")  
+  console.log('Added user: ', curUser);
+  users.push(curUser);
+  console.log("All users id: ", users); 
+  fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
+  ctx.reply('Вы подписались на оповещение о хешрейте');
+  return ctx.scene.enter("homeScene")  
+
 });
   
   
