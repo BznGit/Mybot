@@ -5,7 +5,7 @@ const monitor = new monit();
 const {WizardScene, Scenes, Markup} = require("telegraf");
 // Сцена создания нового матча.
 const home = new Scenes.WizardScene(
-    "homeScene", // Имя сцены
+    "homeSceneWizard", // Имя сцены
     (ctx)=>{
       
       let currUser = users.find(item=>item.userId == ctx.chat.id);
@@ -41,16 +41,15 @@ const home = new Scenes.WizardScene(
   
  
 home.action('onSub', (ctx)=>{
-  ctx.scene.enter("subScene")  
+  ctx.scene.enter("subSceneWizard")  
 });
 home.action('unSub', (ctx)=>{
-  ctx.scene.enter("unSubScene")  
+  ctx.scene.enter("unSubSceneWizard")  
 });
 home.action('changeSub', (ctx)=>{
-  ctx.scene.enter("changeSubScene")  
+  ctx.scene.enter("changeSubSceneWizard")  
 });
-home.command('/back', (ctx) => ctx.scene.enter("homeScene"))
-  
+
 
 module.exports = home;
 

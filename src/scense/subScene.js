@@ -9,7 +9,7 @@ const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.
 const subscribe = new Scenes.WizardScene(
-    "subScene", // Имя сцены
+    "subSceneWizard", // Имя сцены
      (ctx) => {
       ctx.reply('Выберите монету:', {
         parse_mode: 'HTML',
@@ -71,7 +71,7 @@ const subscribe = new Scenes.WizardScene(
         'Оповещение о блоке: '  + ctx.wizard.state.poolId + '\n' +
         'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
         'Воркер: '  + ctx.wizard.state.worker + '\n' +
-        'Оповещение обровене хешрейта: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash,
+        'Оповещение об уровене хешрейта: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash,
         {parse_mode: 'HTML'}
       );
       ctx.reply('Подписаться?', {
@@ -166,16 +166,22 @@ subscribe.action('subHash', (ctx)=>{
   console.log("All users id: ", users); 
   fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
   ctx.reply('Вы подписались на оповещение о хешрейте');
-  return ctx.scene.enter("homeScene")  
+  return ctx.scene.enter("homeSceneWizard")  
 
 });
   
   
 subscribe.action('back', (ctx)=> {
   ctx.scene.leave();
-  ctx.scene.enter("homeScene")  
+  ctx.scene.enter("homeSceneWizard")  
 });
-subscribe.command('/back', (ctx) => ctx.scene.enter("homeScene"))
+
+subscribe.command('/back', (ctx) => {
+  ctx.scene.leave();
+  ctx.scene.enter("homeSceneWizard");
+  console.log('subScene exit');
+})
+  
 
 module.exports = subscribe;
 

@@ -9,7 +9,7 @@ const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.
 const changeSubscribe = new Scenes.WizardScene(
-    "changeSubScene", // Имя сцены
+    "changeSubSceneWizard", // Имя сцены
      (ctx) => {
       ctx.reply('Выберите монету:', {
         parse_mode: 'HTML',
@@ -19,7 +19,8 @@ const changeSubscribe = new Scenes.WizardScene(
         ])    
       })
       return ctx.wizard.next(); 
-    },     
+    },
+    
     (ctx) => {
        axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text)
       .then((response)=> {
@@ -67,9 +68,10 @@ const changeSubscribe = new Scenes.WizardScene(
       
       ctx.reply('<b>Ваши данные:</b>\n'+ 
         'Монета: '  + ctx.wizard.state.poolId + '\n' +
+        'Оповещение о блоке: '  + ctx.wizard.state.poolId + '\n' +
         'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
         'Воркер: '  + ctx.wizard.state.worker + '\n' +
-        'Граничнй  уровень: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash,
+        'Оповещение об уровене хешрейта: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash,
         {parse_mode: 'HTML'}
       );
       ctx.reply('Подписаться?', {
@@ -78,19 +80,49 @@ const changeSubscribe = new Scenes.WizardScene(
           Markup.button.callback('Да', 'subHash'),
           Markup.button.callback('Нет', 'back')
         ])
-      })
-      
+      })   
     }, 
-   
-   
 );
 changeSubscribe.action('chooseEth', (ctx)=>{
-  ctx.wizard.state.poolId = 'ethpool'
-  ctx.reply('Введите ethereun кошелек:'); 
+  ctx.wizard.state.poolId = 'ethpool';
+  ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      Markup.button.callback('Да', 'subBlockEth'),
+      Markup.button.callback('Нет', 'notSubBlockEth')
+    ])
+  }) 
+  
+});
+
+changeSubscribe.action('subBlockEth',  (ctx)=>{
+  ctx.wizard.state.block = 'да'
+  ctx.reply('Введите ethereum кошелек:');
+});
+
+changeSubscribe.action('notSubBlockEth',  (ctx)=>{
+  ctx.wizard.state.block = 'нет'
+  ctx.reply('Введите ethereum кошелек:');
 });
 
 changeSubscribe.action('chooseErgo',  (ctx)=>{
   ctx.wizard.state.poolId = 'ergopool'
+  ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      Markup.button.callback('Да', 'subBlockErgo'),
+      Markup.button.callback('Нет', 'notSubBlockErgo')
+    ])
+  }) 
+});
+
+changeSubscribe.action('subBlockErgo',  (ctx)=>{
+  ctx.wizard.state.block = 'да'
+  ctx.reply('Введите ergo кошелек:');
+});
+
+changeSubscribe.action('notSubBlockErgo',  (ctx)=>{
+  ctx.wizard.state.block = 'нет'
   ctx.reply('Введите ergo кошелек:');
 });
 
@@ -126,7 +158,7 @@ changeSubscribe.action('subHash', (ctx)=>{
     worker : ctx.wizard.state.worker,
     levelHash : ctx.wizard.state.hash,
     defHash : ctx.wizard.state.defHash,
-    block : false,
+    block : ctx.wizard.state.block, 
   };
   
   console.log('Added user: ', curUser);
@@ -134,16 +166,22 @@ changeSubscribe.action('subHash', (ctx)=>{
   console.log("All users id: ", users); 
   fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
   ctx.reply('Вы подписались на оповещение о хешрейте');
-  return ctx.scene.enter("homeScene")  
+  return ctx.scene.enter("homeSceneWizard")  
 
 });
   
   
 changeSubscribe.action('back', (ctx)=> {
   ctx.scene.leave();
-  ctx.scene.enter("homeScene")  
+  ctx.scene.enter("homeSceneWizard")  
 });
-changeSubscribe.command('/back', (ctx) => ctx.scene.enter("homeScene"))
+
+changeSubscribe.command('/back', (ctx) => {
+  ctx.scene.leave();
+  ctx.scene.enter("homeSceneWizard");
+  console.log('changeSubScene exit');
+})
+  
 
 module.exports = changeSubscribe;
 

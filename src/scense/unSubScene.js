@@ -6,7 +6,7 @@ const monitor = new monit();
 const {WizardScene, Scenes, Markup} = require("telegraf");
 // Сцена создания нового матча.
 const unSubscribe = new Scenes.WizardScene(
-    "unSubScene", // Имя сцены
+    "unSubSceneWizard", // Имя сцены
   
     (ctx) => {
       ctx.reply('Вы действительно хотие полность отписатья от поповещения!', {
@@ -29,13 +29,14 @@ const unSubscribe = new Scenes.WizardScene(
       console.log('All current users: ', users);
       fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
       ctx.reply('Вы отписались от всех оповещений!');
-      return ctx.scene.enter("homeScene")  
+      return ctx.scene.enter("homeSceneWizard")  
     }
   });
    
   unSubscribe.action('back', (ctx)=> {
     ctx.scene.leave();
-    return ctx.scene.enter("homeScene")   
+    ctx.scene.enter("homeSceneWizard");
+    console.log('unSubScene exit'); 
   });
 
 module.exports = unSubscribe;

@@ -27,7 +27,7 @@ bot.start((ctx) =>{
     ctx.reply('У Вас недостаточно прав для выполнения этой команды');
     return; 
   }
-  ctx.scene.enter("homeScene")
+  ctx.scene.enter("homeSceneWizard")
 })
 
 // Запуск бота
