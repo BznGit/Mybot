@@ -58,7 +58,7 @@ const subscribe = new Scenes.WizardScene(
       return ctx.wizard.next(); 
     },     
 
-    (ctx) => {
+    async (ctx) => {
       let regexp = /[0-9]/;
       if(!regexp.test(ctx.message.text)){
         ctx.reply('введите число!');
@@ -66,15 +66,15 @@ const subscribe = new Scenes.WizardScene(
       } 
       ctx.wizard.state.hash =  ctx.message.text;
       
-      ctx.reply('<b>Ваши данные:</b>\n'+ 
+      await ctx.reply('<b>Ваши данные:</b>\n'+ 
         'Монета: '  + ctx.wizard.state.poolId + '\n' +
-        'Оповещение о блоке: '  + ctx.wizard.state.poolId + '\n' +
+        'Оповещение о блоке: '  + ctx.wizard.state.block + '\n' +
         'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
         'Воркер: '  + ctx.wizard.state.worker + '\n' +
         'Оповещение об уровене хешрейта: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash,
         {parse_mode: 'HTML'}
       );
-      ctx.reply('Подписаться?', {
+       ctx.reply('Подписаться?', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
           Markup.button.callback('Да', 'subHash'),
@@ -92,7 +92,6 @@ subscribe.action('chooseEth', (ctx)=>{
       Markup.button.callback('Нет', 'notSubBlockEth')
     ])
   }) 
-  
 });
 
 subscribe.action('subBlockEth',  (ctx)=>{
@@ -165,7 +164,6 @@ subscribe.action('subHash', (ctx)=>{
   users.push(curUser);
   console.log("All users id: ", users); 
   fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
-  ctx.reply('Вы подписались на оповещение о хешрейте');
   return ctx.scene.enter("homeSceneWizard")  
 
 });

@@ -24,18 +24,16 @@ const home = new Scenes.WizardScene(
           'Монета: '  + '<i>' + currUser.poolId + '</i>' + '\n' +
           'Кошелек: ' + '<i>' + currUser.wallet + '</i>' + '\n' +
           'Воркер: '  + '<i>' + currUser.worker + '</i>' + '\n' +
-          'Оповещение об уровене хешрейта: ' + '<i>' + currUser.levelHash + ' ' + currUser.defHash + '</i>'+
-          'Оповещение на новом блоке: ' + '<i>' + currUser.block + '</i>',
-          {parse_mode: 'HTML'}
-        );
-  
-        return ctx.reply('Выберите:', {
-          parse_mode: 'HTML',
-          ...Markup.inlineKeyboard([
-              Markup.button.callback('Отписаться от оповещения', 'unSub'),
-              Markup.button.callback('Изменить параметры оповещения', 'changeSub'),
-            ])
-        })  
+          'Оповещение об уровене хешрейта: ' + '<i>' + currUser.levelHash + ' ' + currUser.defHash + '</i>\n'+
+          'Оповещение на новом блоке: ' + '<i>' + currUser.block + '</i>\n' +
+          ',<b>Выберите:</b>',  {
+            parse_mode: 'HTML',
+            ...Markup.inlineKeyboard([
+                Markup.button.callback('Отписаться от оповещения', 'unSub'),
+                Markup.button.callback('Изменить параметры оповещения', 'chengeSub'),
+              ])
+          });
+
      }   
 });
   
@@ -46,8 +44,8 @@ home.action('onSub', (ctx)=>{
 home.action('unSub', (ctx)=>{
   ctx.scene.enter("unSubSceneWizard")  
 });
-home.action('changeSub', (ctx)=>{
-  ctx.scene.enter("changeSubSceneWizard")  
+home.action('chengeSub', (ctx)=>{
+  ctx.scene.enter("chengeSubSceneWizard")  
 });
 
 

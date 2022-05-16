@@ -19,7 +19,7 @@ const unSubscribe = new Scenes.WizardScene(
     }
 );
   //Регистрация подписчика
-  unSubscribe.action('chooseUnSub', (ctx)=>{
+  unSubscribe.action('chooseUnSub', async(ctx)=>{
     let  delUser = users.find(item=>item.userId == ctx.chat.id)
     let index = users.findIndex(item=>item.userId == ctx.chat.id);
     console.log('index=>',index)
@@ -28,7 +28,7 @@ const unSubscribe = new Scenes.WizardScene(
       console.log('User deleted: ', delUser);
       console.log('All current users: ', users);
       fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
-      ctx.reply('Вы отписались от всех оповещений!');
+      await ctx.reply('Вы отписались от всех оповещений!');
       return ctx.scene.enter("homeSceneWizard")  
     }
   });

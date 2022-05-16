@@ -5,7 +5,7 @@ const bot = new Telegraf(settings.telegramBotToken);
 const home = require('./src/scense/homeScene');
 const unSubscribe = require('./src/scense/unSubScene');
 const subscribe = require('./src/scense/subScene');
-const changeSubscribe = require('./src/scense/changeSubScene');
+const chengeSubscribe = require('./src/scense/chengeSubScene');
 const monit = require('./src/controls/apiControls');
 const monitor = new monit();
 
@@ -15,7 +15,7 @@ const stage = new Scenes.Stage();
 //monitor.begin();
 
 // Регистрируем сцену создания матча
-stage.register( home, subscribe, unSubscribe, changeSubscribe);
+stage.register( home, subscribe, unSubscribe, chengeSubscribe);
 
 bot.use(session());
 bot.use(stage.middleware());
