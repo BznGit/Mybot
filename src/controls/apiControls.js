@@ -91,4 +91,4 @@ function getInfo(){
     })
 }
 
-module.exports = monit;
+//module.exports = monit;

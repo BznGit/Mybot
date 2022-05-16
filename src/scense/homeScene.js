@@ -1,7 +1,5 @@
 const fs = require('fs');
 const users = require('../controls/users.json');
-const monit = require('../controls/apiControls');
-const monitor = new monit();
 const {WizardScene, Scenes, Markup} = require("telegraf");
 // Сцена создания нового матча.
 const home = new Scenes.WizardScene(
