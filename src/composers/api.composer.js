@@ -3,12 +3,13 @@ const composer = new Composer();
 const axios = require('axios');
 const settings = require('../../botSettings.json');
 const api = settings.MiningCoreApiEndpoints +'/api/pools/ethpool/blocks';
-var chatIdes=null;
+var users = null;
 var lastBlock = null;
 var tempBlock  =null;
 
-exports =  function start(){
-    chatIdes = require('./chatId.json');
+begin();
+function start(){
+    users = require('../controls/users.json');
     setInterval(getInfo, settings.monitoringPeriodSec*1000)
     console.log('Monitoring started');
 };
@@ -25,10 +26,9 @@ function begin(){
       height:res.data[0].blockHeight,
       status: res.data[0].status
     } 
-    this.start();
+    start();
     })
 }
-
 
 function getInfo(){
 axios({
@@ -41,9 +41,9 @@ axios({
     if (tempBlock != null){
     
     if (currBlock.blockHeight==tempBlock.blockHeight && currBlock.status=='confirmed'){
-      console.log('Active users:', chatIdes);
-      if (chatIdes.length!=0){        
-        chatIdes.forEach(item => {
+      console.log('Active users:', users);
+      if (users.length!=0){        
+        users.forEach(item => {
           console.log('Message sended!')
           composer.telegram.sendMessage(item.userId,
             "НОВЫЙ БЛОК ПОДТВЕРЖДЕН!"+"\n"+
@@ -65,11 +65,11 @@ axios({
       tempBlock = null;
     }
   } else {
-       if (lastBlock.blockHeight != currBlock.blockHeight){
-      if (chatIdes.length!=0){        
-        chatIdes.forEach(item => {
-          console.log('Message sent')
-          composer.telegram.sendMessage(item,
+       if (lastBlock.blockHeight = currBlock.blockHeight){
+      if (users.length!=0){        
+        users.forEach(item => {
+          console.log('Message sended');
+            bot.telegram.sendMessage(item.userId,
             "НАЙДЕН НОВЫЙ БЛОК!"+"\n"+
             "<b>Высота блока: </b>"  + currBlock.blockHeight +"\n" +
             "<b>Сложность сети: </b>" + currBlock.networkDifficulty +"\n"+

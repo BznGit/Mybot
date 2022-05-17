@@ -1,8 +1,6 @@
 const fs = require('fs');
 const users = require('../controls/users.json');
-const monit = require('../controls/apiControls');
 const settings = require('../../botSettings.json');
-const monitor = new monit();
 const {WizardScene, Scenes, Markup} = require("telegraf");
 // Сцена создания нового матча.
 const unSubscribe = new Scenes.WizardScene(

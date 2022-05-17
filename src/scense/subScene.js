@@ -3,8 +3,6 @@ const axios = require('axios');
 const settings = require('../../botSettings.json');
 const api = settings.MiningCoreApiEndpoints;
 const users = require('../controls/users.json');
-const monit = require('../controls/apiControls');
-const monitor = new monit();
 const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.

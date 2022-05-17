@@ -6,8 +6,8 @@ const home = require('./src/scense/homeScene');
 const unSubscribe = require('./src/scense/unSubScene');
 const subscribe = require('./src/scense/subScene');
 const chengeSubscribe = require('./src/scense/chengeSubScene');
-const monit = require('./src/controls/apiControls');
-const monitor = new monit();
+//const monit = require('./src/controls/apiControls');
+//const {start} = require('./src/composers/api.composer')
 
 
 // Создаем менеджера сцен
@@ -20,7 +20,6 @@ stage.register( home, subscribe, unSubscribe, chengeSubscribe);
 bot.use(session());
 bot.use(stage.middleware());
 bot.use(require('./src/composers/api.composer'));
-
 
 bot.start((ctx) =>{
   if (ctx.from.id != settings.adminId && ctx.chat.type =='group'){
