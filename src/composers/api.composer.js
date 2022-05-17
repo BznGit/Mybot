@@ -45,7 +45,7 @@ axios({
       if (chatIdes.length!=0){        
         chatIdes.forEach(item => {
           console.log('Message sended!')
-          composer.telegram.sendMessage(item,
+          composer.telegram.sendMessage(item.userId,
             "НОВЫЙ БЛОК ПОДТВЕРЖДЕН!"+"\n"+
             "<b>Высота блока: </b>"  + currBlock.blockHeight +"\n" +
             "<b>Сложность сети: </b>" + currBlock.networkDifficulty +"\n"+

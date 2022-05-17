@@ -2,13 +2,13 @@
 
 const settings = require('../../botSettings.json');
 const api = settings.MiningCoreApiEndpoints +'/api/pools/ethpool/blocks';
-var chatIdes=null;
+
 var lastBlock = null;
 var tempBlock  =null;
 
 class monit {
    start(){
-        chatIdes = require('./chatId.json');
+        chatIdes = require('../composers/users.json');
         setInterval(getInfo, settings.monitoringPeriodSec*1000)
         console.log('Monitoring started');
     }
