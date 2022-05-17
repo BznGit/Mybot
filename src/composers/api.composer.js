@@ -69,7 +69,7 @@ axios({
       if (users.length!=0){        
         users.forEach(item => {
           console.log('Message sended');
-            bot.telegram.sendMessage(item.userId,
+           composer.telegram.sendMessage(item.userId,
             "НАЙДЕН НОВЫЙ БЛОК!"+"\n"+
             "<b>Высота блока: </b>"  + currBlock.blockHeight +"\n" +
             "<b>Сложность сети: </b>" + currBlock.networkDifficulty +"\n"+
