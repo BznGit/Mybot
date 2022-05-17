@@ -18,13 +18,18 @@ const home = new Scenes.WizardScene(
       }
       else
       {
+        let text='';
+        let item = currUser.workers
+        for(let i=0; i<item.length; i++){
+          text += '- ' + item[i].name +' ограничение:' + item[i].hashLevel +' '+ item[i].hashDev + ',\n'
+        }
         ctx.reply('<b>Вы подписаны на оповещение с параметрами:</b>\n' +
           'Монета: '  + '<i>' + currUser.poolId + '</i>' + '\n' +
-          'Кошелек: ' + '<i>' + currUser.wallet + '</i>' + '\n' +
-          'Воркер: '  + '<i>' + currUser.worker + '</i>' + '\n' +
-          'Оповещение об уровене хешрейта: ' + '<i>' + currUser.levelHash + ' ' + currUser.defHash + '</i>\n'+
-          'Оповещение на новом блоке: ' + '<i>' + currUser.block + '</i>\n' +
-          ',<b>Выберите:</b>',  {
+          'Оповещение о новом блоке: ' + '<i>' + currUser.block + '</i>\n' +
+          'Кошелек: ' + '<i>' + currUser.wallet + '</i>' + ',\n' +
+          'Воркеры: \n'  + text + 
+                  
+          '<b>Выберите:</b>',  {
             parse_mode: 'HTML',
             ...Markup.inlineKeyboard([
                 Markup.button.callback('Отписаться от оповещения', 'unSub'),

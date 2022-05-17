@@ -43,8 +43,12 @@ const subscribe = new Scenes.WizardScene(
       })    
     }, 
     (ctx) => {
-
-      ctx.wizard.state.worker =  ctx.message.text;
+      ctx.wizard.state.worker = {
+        name: ctx.message.text,
+        hashLevel: null,
+        hashDev: null,
+        delivered: false
+      }
       ctx.reply('Выберите размерность граничного уровня хешрейта:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
@@ -56,29 +60,30 @@ const subscribe = new Scenes.WizardScene(
       return ctx.wizard.next(); 
     },     
 
-    async (ctx) => {
+    (ctx) => {
       let regexp = /[0-9]/;
       if(!regexp.test(ctx.message.text)){
         ctx.reply('введите число!');
         return 
       } 
-      ctx.wizard.state.hash =  ctx.message.text;
-      
-      await ctx.reply('<b>Ваши данные:</b>\n'+ 
+      ctx.wizard.state.worker.hashLevel =  ctx.message.text;
+      ctx.wizard.state.worker.delivered = false;
+      ctx.reply('<b>Ваши данные:</b>\n'+ 
         'Монета: '  + ctx.wizard.state.poolId + '\n' +
-        'Оповещение о блоке: '  + ctx.wizard.state.block + '\n' +
+        'Оповещение о новом блоке: '  + ctx.wizard.state.block + '\n' +
         'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
-        'Воркер: '  + ctx.wizard.state.worker + '\n' +
-        'Оповещение об уровене хешрейта: '  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash,
+        'Воркер: '  + ctx.wizard.state.worker.name + '\n' +
+        'Оповещение об уровене хешрейта: '  + ctx.wizard.state.worker.hashLevel + ' ' + ctx.wizard.state.worker.hashDev,
         {parse_mode: 'HTML'}
-      );
-       ctx.reply('Подписаться?', {
+      ).then(
+        ctx.reply('Подписаться?', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
           Markup.button.callback('Да', 'subHash'),
           Markup.button.callback('Нет', 'back')
         ])
-      })   
+      })
+      )      
     }, 
 );
 subscribe.action('chooseEth', (ctx)=>{
@@ -124,15 +129,15 @@ subscribe.action('notSubBlockErgo',  (ctx)=>{
 });
 
 subscribe.action('chooseM',  (ctx)=>{
-  ctx.wizard.state.defHash = 'MH/s'
+  ctx.wizard.state.worker.hashDev = 'MH/s'
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
 subscribe.action('chooseG',  (ctx)=>{
-  ctx.wizard.state.defHash = 'GH/s'
+  ctx.wizard.state.worker.hashDev = 'GH/s'
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
 subscribe.action('chooseT',  (ctx)=>{
-  ctx.wizard.state.defHash = 'TH/s'
+  ctx.wizard.state.worker.hashDev = 'TH/s'
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
 
@@ -152,10 +157,9 @@ subscribe.action('subHash', (ctx)=>{
     userId: ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
     wallet : ctx.wizard.state.wallet,
-    worker : ctx.wizard.state.worker,
-    levelHash : ctx.wizard.state.hash,
-    defHash : ctx.wizard.state.defHash,
     block : ctx.wizard.state.block, 
+    workers : [ctx.wizard.state.worker],
+
   };
   
   console.log('Added user: ', curUser);

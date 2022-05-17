@@ -7,7 +7,7 @@ const unSubscribe = new Scenes.WizardScene(
     "unSubSceneWizard", // Имя сцены
   
     (ctx) => {
-      ctx.reply('Вы действительно хотие полность отписатья от поповещения!', {
+      ctx.reply('Вы действительно хотие полностью отписатья от поповещения!', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
           Markup.button.callback ('Да','chooseUnSub'),

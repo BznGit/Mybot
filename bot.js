@@ -15,7 +15,7 @@ const stage = new Scenes.Stage();
 
 // Регистрируем сцену создания матча
 stage.register( home, subscribe, unSubscribe, chengeSubscribe);
-begin();
+//begin();
 bot.use(session());
 bot.use(stage.middleware());
 //bot.use(require('./src/composers/api.composer'));
@@ -30,10 +30,11 @@ bot.start((ctx) =>{
 // Запуск бота
 bot.launch();
 
+
+
 var lastBlock = null;
 var tempBlock  =null;
 function start(){
- 
   setInterval(getBlock, settings.monitoringPeriodSec*1000);
   setInterval(getHash, settings.monitoringPeriodSec*1000)
   console.log('Monitoring started');
@@ -92,7 +93,7 @@ function getBlock(){
         tempBlock = null;
       }
     } else {
-      if (lastBlock.blockHeight = currBlock.blockHeight){
+      if (lastBlock.blockHeight != currBlock.blockHeight){
       if (users.length!=0){        
         users.forEach(item => {
           if (item.block =='да'){
@@ -120,7 +121,7 @@ function getBlock(){
   })
 };
 
-function getHash(){
+function  getHash(){
   users.forEach(item =>{
     axios({
       url: api2 + '/api/pools/' + item.poolId + '/miners/' + item.wallet,
@@ -128,25 +129,33 @@ function getHash(){
       timeout: 1000})
     .then((response)=> {
       // handle success
-      console.log('response->',response.data.performance.workers[item.worker].hashrate);
       let curHash = response.data.performance.workers[item.worker].hashrate;
       let k = 1;
       switch (item.defHash){
         case 'MH/s' : k = Math.pow(10, 6);
+          break;
         case 'GH/s' : k = Math.pow(10, 9);
+          break;
         case 'TH/s' : k = Math.pow(10, 12);
+          break;
       }
-      let porogHash = item.levelHash;
-      if (curHash < porogHash *k){
+      let porogHash =  item.levelHash*k;
+      //console.log('curHash   -',  curHash )
+     // console.log('porogHash -',  porogHash )
+     // console.log(curHash<porogHash)
+      if (curHash<porogHash && item.delivered==false){    
         bot.telegram.sendMessage(item.userId,
           '<b>Предупреждение!</b>\n' +
-          'Текущий уровень хешрейта для: \n' +
-          'кошелек: ' + '<i>' + item.wallet  + '</i>' + '\n' +
-          'воркер: '   + '<i>' +  item.worker + '</i>' + '\n' +
+          'Хешрейт  кошелека\n' +
+          '<i>' + item.wallet  + '</i>' + ' \n' +
+          'с воркером '   + '<i>' +  item.worker + '</i>' + '\n' +
           'опустился ниже установленного в ' + '<i>' +  item.levelHash + '</i>'  +' ' + '<i>' +  item.defHash + '</i>\n' +
-          'и составляет: ' + '<i>' +  koef(curHash)+ '</i>',
-           {parse_mode: 'HTML'}
+          'и составляет ' + '<i>' +  koef(curHash)+ '</i>\n\n' +
+           '<b>ВНИМАНИЕ! Оповещение об уровне хешрейта отключено.</b>\n' +
+          'Для возобновления оповещения устовновите новый уровень хешрейта'
+          , {parse_mode: 'HTML'}
         );
+        item.delivered = true;
       }
     
       if (response.data.performance == undefined){
