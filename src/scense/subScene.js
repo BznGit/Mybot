@@ -52,10 +52,11 @@ const subscribe = new Scenes.WizardScene(
       ctx.reply('Выберите размерность граничного уровня хешрейта:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
-          Markup.button.callback('MH/s', 'chooseM'),
-          Markup.button.callback('GH/s', 'chooseG'),
-          Markup.button.callback('TH/s', 'chooseT'),        
-        ])    
+        [{ text: "KH/s", callback_data: "chooseK" }, { text: "MH/s", callback_data: "chooseM" },{ text: "GH/s", callback_data: "chooseG" }],
+        [{ text: "TH/s", callback_data: "chooseT" }, { text: "PH/s", callback_data: "chooseP" }],      
+        ])
+        
+           
       })
       return ctx.wizard.next(); 
     },     
@@ -109,11 +110,11 @@ subscribe.action('notSubBlockEth',  (ctx)=>{
 
 subscribe.action('chooseErgo',  (ctx)=>{
   ctx.wizard.state.poolId = 'ergopool'
-  ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
+  ctx.reply('Подписаться на оповещение о новом блоке ergo?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
-      Markup.button.callback('Да', 'subBlockErgo'),
-      Markup.button.callback('Нет', 'notSubBlockErgo')
+      { text: "Да'", callback_data: 'subBlockErgo' }, 
+      { text: "Нет", callback_data: 'notSubBlockErgo' }
     ])
   }) 
 });
@@ -128,6 +129,10 @@ subscribe.action('notSubBlockErgo',  (ctx)=>{
   ctx.reply('Введите ergo кошелек:');
 });
 
+subscribe.action('chooseK',  (ctx)=>{
+  ctx.wizard.state.worker.hashDev = 'KH/s'
+  ctx.reply('Введите значение критического уровня хашрейта:');
+});
 subscribe.action('chooseM',  (ctx)=>{
   ctx.wizard.state.worker.hashDev = 'MH/s'
   ctx.reply('Введите значение критического уровня хашрейта:');
@@ -138,6 +143,10 @@ subscribe.action('chooseG',  (ctx)=>{
 });
 subscribe.action('chooseT',  (ctx)=>{
   ctx.wizard.state.worker.hashDev = 'TH/s'
+  ctx.reply('Введите значение критического уровня хашрейта:');
+});
+subscribe.action('chooseP',  (ctx)=>{
+  ctx.wizard.state.worker.hashDev = 'PH/s'
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
 

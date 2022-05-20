@@ -9,9 +9,10 @@ const unSubscribe = require('./src/scense/unSubScene');
 const subscribe = require('./src/scense/subScene');
 const chengeSubscribe = require('./src/scense/chengeSubScene');
 const users = require('./src/controls/users.json');
+const {formatHashrate} = require('./src/libs/utils.js');
+const {koeff} = require('./src/libs/utils.js');
 // Создаем менеджера сцен
 const stage = new Scenes.Stage();
-//monitor.begin();
 
 // Регистрируем сцену создания матча
 stage.register( home, subscribe, unSubscribe, chengeSubscribe);
@@ -130,16 +131,9 @@ function  getHash(){
     .then((response)=> {
       // handle success
       let curHash = response.data.performance.workers[item.worker].hashrate;
-      let k = 1;
-      switch (item.defHash){
-        case 'MH/s' : k = Math.pow(10, 6);
-          break;
-        case 'GH/s' : k = Math.pow(10, 9);
-          break;
-        case 'TH/s' : k = Math.pow(10, 12);
-          break;
-      }
-      let porogHash =  item.levelHash*k;
+    
+      let porogHash =  item.levelHash*koeff(item.defHash)
+      ;
       //console.log('curHash   -',  curHash )
      // console.log('porogHash -',  porogHash )
      // console.log(curHash<porogHash)
@@ -150,7 +144,7 @@ function  getHash(){
           '<i>' + item.wallet  + '</i>' + ' \n' +
           'с воркером '   + '<i>' +  item.worker + '</i>' + '\n' +
           'опустился ниже установленного в ' + '<i>' +  item.levelHash + '</i>'  +' ' + '<i>' +  item.defHash + '</i>\n' +
-          'и составляет ' + '<i>' +  koef(curHash)+ '</i>\n\n' +
+          'и составляет ' + '<i>' +  formatHashrate(curHash)+ '</i>\n\n' +
            '<b>ВНИМАНИЕ! Оповещение об уровне хешрейта отключено.</b>\n' +
           'Для возобновления оповещения устовновите новый уровень хешрейта'
           , {parse_mode: 'HTML'}
@@ -174,13 +168,5 @@ function  getHash(){
   })  
 }
 
-function koef(rate) {
-  rate= parseFloat(rate); let unit= 'H/s';
-  if(rate >= 1000) { rate /= 1000; unit= 'KH/s'; }
-  if(rate >= 1000) { rate /= 1000; unit= 'MH/s'; }
-  if(rate >= 1000) { rate /= 1000; unit= 'GH/s'; }
-  if(rate >= 1000) { rate /= 1000; unit= 'TH/s'; }
-  if(rate >= 1000) { rate /= 1000; unit= 'PH/s'; }
-  return (rate.toFixed(2) + ' ' + unit);
-}
+
 

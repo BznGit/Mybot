@@ -10,24 +10,19 @@ const chengeSubscribe = new Scenes.WizardScene(
     "chengeSubSceneWizard", // Имя сцены
     // step #0
     (ctx)=>{
-      let  curUser = users.find(item=>item.userId == ctx.chat.id)
+      let  curUser = users.find(item=>item.userId == ctx.chat.id);
+      let tempArr = JSON.parse(JSON.stringify(curUser.workers));
 
-      ctx.wizard.state.poolId  = curUser.poolId; 
-      ctx.wizard.state.wallet  = curUser.wallet;
-      ctx.wizard.state.worker  = curUser.worker ;
-      ctx.wizard.state.hash    = curUser.levelHash;
-      ctx.wizard.state.defHash = curUser.defHash ;
-      ctx.wizard.state.block   = curUser.block ;
+      ctx.wizard.state.poolId = curUser.poolId; 
+      ctx.wizard.state.wallet = curUser.wallet;
+      ctx.wizard.state.workers = tempArr;
+      ctx.wizard.state.block  = curUser.block ;
      
       ctx.reply('Выберите параметр, который необходимо изменить:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
-          Markup.button.callback ('Монета','chooseCoin'),
-          Markup.button.callback('Оповещение о облоке', 'chooseblock'), 
-          Markup.button.callback('Кошелек', 'chooseWallet'), 
-          Markup.button.callback ('Воркер','chooseWorker'),
-          Markup.button.callback('Уровень хешрейта', 'chooseHash'), 
-               
+          [{ text: "Монета", callback_data: "chooseCoin" }, { text: "Кошелек", callback_data: "chooseWallet" },{ text: "Воркеры", callback_data: "chooseWorker" }],
+          [{ text: "Оповещение о облоке", callback_data: "chooseblock" }],                
         ]) 
       })  
     },
@@ -68,25 +63,37 @@ const chengeSubscribe = new Scenes.WizardScene(
     }, 
     // step #3
     (ctx) => {
-      ctx.wizard.state.worker = [];
-      let worker = {
-        id: ctx.message.text,
-        hashLevel: null,
-        hashDev: null,
-        delivered: false
+      
+      let currWorkers = ctx.wizard.state.workers;
+      let choosedWorker = ctx.message.text;
+      console.log('choosedWorker>',choosedWorker);
+      console.log('currWorkers>',currWorkers);
+      let curWorkerIndex = currWorkers.findIndex(item=>item.name == choosedWorker);
+      console.log(' index>',curWorkerIndex)
+      if (curWorkerIndex!=-1){
+        ctx.wizard.state.curWorkerIndex = curWorkerIndex;
+        console.log('---->',ctx.wizard.state.curWorkerIndex);
+        //Здесь думать!!!!!!!!!!
+      } else {
+        let worker = {
+          id: ctx.message.text,
+          hashLevel: null,
+          hashDev: null,
+          delivered: false
+        }
+        
+        ctx.wizard.state.tempWorker = worker;
+        console.log('---->', ctx.wizard.state.workers);
       }
-      ctx.wizard.state.workers.push(worker);
-      ctx.reply(ctx.wizard.state.worker)
-      if (ctx.wizard.state.worker==undefined) ctx.wizard.state.worker =  ctx.message.text;
       ctx.reply('Выберите размерность граничного уровня хешрейта:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
-          Markup.button.callback('MH/s', 'chooseM'),
-          Markup.button.callback('GH/s', 'chooseG'),
-          Markup.button.callback('TH/s', 'chooseT'),        
-        ])    
+          [{ text: "KH/s", callback_data: "chooseK" },{ text: "MH/s", callback_data: "chooseM" },{ text: "GH/s", callback_data: "chooseG" }],
+          [{ text: "TH/s", callback_data: "chooseT" },{ text: "PH/s", callback_data: "chooseP" }],      
+        ])
       })
-      return ctx.wizard.next(); 
+      return ctx.wizard.next()
+       
     },     
     // step #4      
     (ctx) => {
@@ -95,26 +102,50 @@ const chengeSubscribe = new Scenes.WizardScene(
         ctx.reply('введите число!');
         return 
       } 
-      ctx.wizard.state.hash =  ctx.message.text;
-      ctx.wizard.state.delivered = false;
-      
-      ctx.reply('<b>Ваши новые данные:</b>\n'+ 
-        'Монета: '  + '<i>' + ctx.wizard.state.poolId + '</i>'+ '\n' +
-        'Оповещение о новом блоке: ' + '<i>'  +ctx.wizard.state.block + '</i>' + '\n' +
-        'Кошелек: ' + '<i>' + ctx.wizard.state.wallet + '</i>' + '\n' +
-        'Воркер: '  + '<i>' + ctx.wizard.state.worker + '</i>' + '\n' +
-        'Оповещение об уровене хешрейта: '  + '<i>'  + ctx.wizard.state.hash + ' ' + ctx.wizard.state.defHash + '</i>',
-        {parse_mode: 'HTML'}
-      ).then(
-         ctx.reply('Подписаться?', {
-        parse_mode: 'HTML',
-        ...Markup.inlineKeyboard([
-          Markup.button.callback('Да', 'subHash'),
-          Markup.button.callback('Нет', 'back')
-        ])
-      }) 
-      );
-       
+      if (ctx.wizard.state.curWorkerIndex!=undefined){
+        ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashLevel = ctx.message.text;
+        let text='';
+        let item = ctx.wizard.state.workers;
+        for(let i=0; i<item.length; i++){
+          text += '- ' + item[i].name +' ограничение: ' + item[i].hashLevel +' '+ item[i].hashDev + ',\n'
+        }
+        ctx.reply('<b>Ваши новые данные:</b>\n' +
+          'Монета: '  + '<i>' + ctx.wizard.state.poolId + '</i>' + '\n' +
+          'Оповещение о новом блоке: ' + '<i>' + ctx.wizard.state.block + '</i>\n' +
+          'Кошелек: ' + '<i>' + ctx.wizard.state.wallet + '</i>' + ',\n' +
+          'Воркеры: \n'  + text + 
+                  
+          '<b>Выберите:</b>',  {
+            parse_mode: 'HTML',
+          }).then(
+            ctx.reply('Подписаться?', {
+              parse_mode: 'HTML',
+              ...Markup.inlineKeyboard([
+                { text: "Да'", callback_data: "subHash" }, 
+                { text: "Нет", callback_data: "back" }
+              ])
+            }) 
+          );
+      } else{
+        ctx.wizard.state.tempWorker.hashLevel =  ctx.message.text;
+        ctx.wizard.state.tempWorker.delivered = false;
+        ctx.reply('<b>Ваши новые данные:</b>\n'+ 
+          'Монета: '  + '<i>' + ctx.wizard.state.poolId + '</i>'+ '\n' +
+          'Оповещение о новом блоке: ' + '<i>'  +ctx.wizard.state.block + '</i>' + '\n' +
+          'Кошелек: ' + '<i>' + ctx.wizard.state.wallet + '</i>' + '\n' +
+          'Воркер: '  + '<i>' + ctx.wizard.state.tempWorker.name + '</i>' + '\n' +
+          'Оповещение об уровене хешрейта: '  + '<i>'  + ctx.wizard.state.tempWorker.hashLevel + ' ' + ctx.wizard.state.tempWorker.hashDev + '</i>',
+          {parse_mode: 'HTML'}
+        ).then(
+          ctx.reply('Подписаться?', {
+            parse_mode: 'HTML',
+            ...Markup.inlineKeyboard([
+              { text: "Да'", callback_data: "subHash" }, 
+              { text: "Нет", callback_data: "back" }
+            ])
+          }) 
+        );
+      }       
     }, 
 );
 
@@ -167,8 +198,7 @@ chengeSubscribe.action('chooseblock',  (ctx)=>{
       ctx.reply('Оповещение о новом блоке', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
-          Markup.button.callback('Подписаться', 'subHash'),
-       
+          { text: "Подписаться", callback_data: "subHash" }
         ])
      }) 
   } else{
@@ -176,8 +206,7 @@ chengeSubscribe.action('chooseblock',  (ctx)=>{
     ctx.reply('Оповещение о новом блоке', {
       parse_mode: 'HTML',
       ...Markup.inlineKeyboard([
-        Markup.button.callback('Отписаться', 'subHash'),
-
+        { text: "Отписаться", callback_data: "subHash" }
       ])
    }) 
   } 
@@ -189,8 +218,8 @@ chengeSubscribe.action('chooseEth', (ctx)=>{
   ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
-      Markup.button.callback('Да', 'subBlockEth'),
-      Markup.button.callback('Нет', 'notSubBlockEth')
+      { text: "Да'", callback_data: 'subBlockEth' }, 
+      { text: "Нет", callback_data: 'notSubBlockEth' }
     ])
   }) 
   
@@ -208,11 +237,11 @@ chengeSubscribe.action('notSubBlockEth',  (ctx)=>{
 
 chengeSubscribe.action('chooseErgo',  (ctx)=>{
   ctx.wizard.state.poolId = 'ergopool'
-  ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
+  ctx.reply('Подписаться на оповещение о новом блоке ergo?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
-      Markup.button.callback('Да', 'subBlockErgo'),
-      Markup.button.callback('Нет', 'notSubBlockErgo')
+      { text: "Да'", callback_data: 'subBlockErgo' }, 
+      { text: "Нет", callback_data: 'notSubBlockErgo' }
     ])
   }) 
 });
@@ -226,19 +255,38 @@ chengeSubscribe.action('notSubBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'нет'
   ctx.reply('Введите ergo кошелек:');
 });
-
+// Выбор единиц измерения хешрейта----------------------------------------------
+chengeSubscribe.action('chooseK',  (ctx)=>{
+  if (ctx.wizard.state.curWorkerIndex!==undefined)
+    ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'KH/s';
+  else ctx.wizard.state.tempWorker.hashDev  = 'KH/s';
+  ctx.reply('Введите значение критического уровня хашрейта:');
+});
 chengeSubscribe.action('chooseM',  (ctx)=>{
-  ctx.wizard.state.defHash = 'MH/s'
+  if (ctx.wizard.state.curWorkerIndex!=undefined)
+    ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'MH/s';
+  else ctx.wizard.state.tempWorker.hashDev  = 'MH/s';
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
 chengeSubscribe.action('chooseG',  (ctx)=>{
-  ctx.wizard.state.defHash = 'GH/s'
+  if (ctx.wizard.state.curWorkerIndex!=undefined)
+    ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'GH/s';
+  else ctx.wizard.state.tempWorker.hashDev  = 'GH/s';
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
 chengeSubscribe.action('chooseT',  (ctx)=>{
-  ctx.wizard.state.defHash = 'TH/s'
+  if (ctx.wizard.state.curWorkerIndex!=undefined)
+    ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'TH/s';
+  else ctx.wizard.state.tempWorker.hashDev  = 'TH/s';
+  ctx.reply('Введите значение критического уровня хашрейта:');
+  });
+chengeSubscribe.action('chooseP',  (ctx)=>{
+  if (ctx.wizard.state.curWorkerIndex!=undefined)
+    ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'PH/s';
+  else  ctx.wizard.state.tempWorker.hashDev  = 'PH/s';
   ctx.reply('Введите значение критического уровня хашрейта:');
 });
+//---------------------------------------------------------------
 
 chengeSubscribe.action('setHash', (ctx)=>{
   return ctx.reply('Введите пороговый уровень хешрейта:', {
@@ -257,12 +305,10 @@ chengeSubscribe.action('subHash', async(ctx)=>{
     userId: ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
     wallet : ctx.wizard.state.wallet,
-    worker : ctx.wizard.state.worker,
-    levelHash : ctx.wizard.state.hash,
-    defHash : ctx.wizard.state.defHash,
     block : ctx.wizard.state.block, 
-    delivered: ctx.wizard.state.delivered,
+    workers : ctx.wizard.state.workers,
   };
+  console.log('block:',ctx.wizard.state.workers);
   
   let index = users.findIndex(item=>item.userId == ctx.chat.id);
   console.log('index=>',index)
@@ -273,7 +319,7 @@ chengeSubscribe.action('subHash', async(ctx)=>{
     console.log('All current users: ', users);
     fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
    await  ctx.reply('Ваши данные изменены!');
-   ctx.scene.enter("homeSceneWizard")  
+   ctx.scene.enter("homeSceneWizard");
   }
 
 });

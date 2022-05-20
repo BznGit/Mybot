@@ -21,7 +21,7 @@ const home = new Scenes.WizardScene(
         let text='';
         let item = currUser.workers
         for(let i=0; i<item.length; i++){
-          text += '- ' + item[i].name +' ограничение:' + item[i].hashLevel +' '+ item[i].hashDev + ',\n'
+          text += '- ' + item[i].name +' ограничение: ' + item[i].hashLevel +' '+ item[i].hashDev + ',\n'
         }
         ctx.reply('<b>Вы подписаны на оповещение с параметрами:</b>\n' +
           'Монета: '  + '<i>' + currUser.poolId + '</i>' + '\n' +
