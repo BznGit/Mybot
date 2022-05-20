@@ -140,7 +140,7 @@ const chengeSubscribe = new Scenes.WizardScene(
           ctx.reply('Подписаться?', {
             parse_mode: 'HTML',
             ...Markup.inlineKeyboard([
-              { text: "Да'", callback_data: "subHash" }, 
+              { text: "Да", callback_data: "subHash" }, 
               { text: "Нет", callback_data: "back" }
             ])
           }) 
