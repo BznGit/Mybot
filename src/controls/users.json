@@ -1,1 +1,1 @@
-[{"userId":886960493,"poolId":"ethpool","wallet":"0x3c3c29f7fa5e8ee76807a941817e900bc569915a","block":"да","workers":[{"name":"588","hashLevel":"33","hashDev":"GH/s","delivered":false}]}]
+[{"userId":886960493,"poolId":"ethpool","wallet":"0xe568eddd2420c0479682b1a4cdadc1358789793b","block":"да","workers":[{"name":"588","hashLevel":"10","hashDev":"MH/s","delivered":false},{"name":"1080ti","hashLevel":"40","hashDev":"MH/s","delivered":false}]}]

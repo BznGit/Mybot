@@ -24,5 +24,4 @@ let koeff = function(def){
       }
       return k
   };
-  module.exports = (koeff, formatHashrate)
- 
+  module.exports = {koeff, formatHashrate}

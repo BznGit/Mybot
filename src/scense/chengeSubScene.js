@@ -76,7 +76,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         //Здесь думать!!!!!!!!!!
       } else {
         let worker = {
-          id: ctx.message.text,
+          name: ctx.message.text,
           hashLevel: null,
           hashDev: null,
           delivered: false
@@ -102,6 +102,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         ctx.reply('введите число!');
         return 
       } 
+      //Проверка на существующий воркер ----------------------------
       if (ctx.wizard.state.curWorkerIndex!=undefined){
         ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashLevel = ctx.message.text;
         let text='';
@@ -127,6 +128,7 @@ const chengeSubscribe = new Scenes.WizardScene(
             }) 
           );
       } else{
+        //Проверка на несуществующий воркер ----------------------------
         ctx.wizard.state.tempWorker.hashLevel =  ctx.message.text;
         ctx.wizard.state.tempWorker.delivered = false;
         ctx.reply('<b>Ваши новые данные:</b>\n'+ 
@@ -300,7 +302,10 @@ chengeSubscribe.action('setHash', (ctx)=>{
 });
 
 chengeSubscribe.action('subHash', async(ctx)=>{
-  
+  if(ctx.wizard.state.tempWorker!=undefined){
+    ctx.wizard.state.workers.push(ctx.wizard.state.tempWorker)
+    
+  }
   let newUser = {
     userId: ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
@@ -308,7 +313,7 @@ chengeSubscribe.action('subHash', async(ctx)=>{
     block : ctx.wizard.state.block, 
     workers : ctx.wizard.state.workers,
   };
-  console.log('block:',ctx.wizard.state.workers);
+  
   
   let index = users.findIndex(item=>item.userId == ctx.chat.id);
   console.log('index=>',index)
