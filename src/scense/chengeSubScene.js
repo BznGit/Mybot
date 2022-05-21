@@ -73,10 +73,10 @@ const chengeSubscribe = new Scenes.WizardScene(
       if (curWorkerIndex!=-1){
         ctx.wizard.state.curWorkerIndex = curWorkerIndex;
         console.log('---->',ctx.wizard.state.curWorkerIndex);
-        //Здесь думать!!!!!!!!!!
+ 
       } else {
         let worker = {
-          id: ctx.message.text,
+          name: ctx.message.text,
           hashLevel: null,
           hashDev: null,
           delivered: false
@@ -102,8 +102,10 @@ const chengeSubscribe = new Scenes.WizardScene(
         ctx.reply('введите число!');
         return 
       } 
+      //Проверка на существующий воркер ----------------------------
       if (ctx.wizard.state.curWorkerIndex!=undefined){
         ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashLevel = ctx.message.text;
+        ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].delivered = flase;
         let text='';
         let item = ctx.wizard.state.workers;
         for(let i=0; i<item.length; i++){
@@ -127,6 +129,7 @@ const chengeSubscribe = new Scenes.WizardScene(
             }) 
           );
       } else{
+        //Проверка на несуществующий воркер ----------------------------
         ctx.wizard.state.tempWorker.hashLevel =  ctx.message.text;
         ctx.wizard.state.tempWorker.delivered = false;
         ctx.reply('<b>Ваши новые данные:</b>\n'+ 
@@ -140,7 +143,7 @@ const chengeSubscribe = new Scenes.WizardScene(
           ctx.reply('Подписаться?', {
             parse_mode: 'HTML',
             ...Markup.inlineKeyboard([
-              { text: "Да'", callback_data: "subHash" }, 
+              { text: "Да", callback_data: "subHash" }, 
               { text: "Нет", callback_data: "back" }
             ])
           }) 
@@ -300,7 +303,10 @@ chengeSubscribe.action('setHash', (ctx)=>{
 });
 
 chengeSubscribe.action('subHash', async(ctx)=>{
-  
+  if(ctx.wizard.state.tempWorker!=undefined){
+    ctx.wizard.state.workers.push(ctx.wizard.state.tempWorker)
+    
+  }
   let newUser = {
     userId: ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
@@ -308,7 +314,7 @@ chengeSubscribe.action('subHash', async(ctx)=>{
     block : ctx.wizard.state.block, 
     workers : ctx.wizard.state.workers,
   };
-  console.log('block:',ctx.wizard.state.workers);
+  
   
   let index = users.findIndex(item=>item.userId == ctx.chat.id);
   console.log('index=>',index)

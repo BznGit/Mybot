@@ -16,7 +16,7 @@ const stage = new Scenes.Stage();
 
 // Регистрируем сцену создания матча
 stage.register( home, subscribe, unSubscribe, chengeSubscribe);
-//begin();
+begin();
 bot.use(session());
 bot.use(stage.middleware());
 //bot.use(require('./src/composers/api.composer'));
@@ -94,7 +94,7 @@ function getBlock(){
         tempBlock = null;
       }
     } else {
-      if (lastBlock.blockHeight != currBlock.blockHeight){
+      if (lastBlock.blockHeight == currBlock.blockHeight){
       if (users.length!=0){        
         users.forEach(item => {
           if (item.block =='да'){
@@ -130,27 +130,33 @@ function  getHash(){
       timeout: 1000})
     .then((response)=> {
       // handle success
-      let curHash = response.data.performance.workers[item.worker].hashrate;
-    
-      let porogHash =  item.levelHash*koeff(item.defHash)
-      ;
-      //console.log('curHash   -',  curHash )
-     // console.log('porogHash -',  porogHash )
-     // console.log(curHash<porogHash)
-      if (curHash<porogHash && item.delivered==false){    
-        bot.telegram.sendMessage(item.userId,
-          '<b>Предупреждение!</b>\n' +
-          'Хешрейт  кошелека\n' +
-          '<i>' + item.wallet  + '</i>' + ' \n' +
-          'с воркером '   + '<i>' +  item.worker + '</i>' + '\n' +
-          'опустился ниже установленного в ' + '<i>' +  item.levelHash + '</i>'  +' ' + '<i>' +  item.defHash + '</i>\n' +
-          'и составляет ' + '<i>' +  formatHashrate(curHash)+ '</i>\n\n' +
-           '<b>ВНИМАНИЕ! Оповещение об уровне хешрейта отключено.</b>\n' +
-          'Для возобновления оповещения устовновите новый уровень хешрейта'
-          , {parse_mode: 'HTML'}
-        );
-        item.delivered = true;
-      }
+      let allWorkers = response.data.performance.workers;
+      let controlledWorkers = item.workers;
+      console.log('allWorkers:', allWorkers);
+      console.log('controlledWorkers:', item.workers);
+      controlledWorkers.forEach(itemCW=>{
+        let itemAWhash = allWorkers[itemCW.name].hashrate;
+        if (itemAWhash!=undefined){
+          let itemPorog = itemCW.hashLevel*koeff(itemCW.hashDev)
+          if (itemAWhash<itemPorog && itemCW.delivered==false){    
+                bot.telegram.sendMessage(item.userId,
+                  '<b>Предупреждение!</b>\n' +
+                  'Хешрейт  кошелека\n' +
+                  '<i>' + item.wallet  + '</i>' + ' \n' +
+                  'с воркером '   + '<i>' +  itemCW.name + '</i>' + '\n' +
+                  'опустился ниже установленного в ' + '<i>' +  itemCW.hashLevel + '</i>'  +' ' + '<i>' +  itemCW.hashDev + '</i>\n' +
+                  'и составляет ' + '<i>' +  formatHashrate(itemAWhash)+ '</i>\n\n' +
+                  '<b>ВНИМАНИЕ! Оповещение об уровне хешрейта отключено.</b>\n' +
+                  'Для возобновления оповещения устовновите новый уровень хешрейта для этого воркера'
+                  , {parse_mode: 'HTML'}
+                );
+                itemCW.delivered = true;
+          }
+        }
+        
+      })
+     
+      
     
       if (response.data.performance == undefined){
         console.log('Ошибка опроса хешрейта!');
