@@ -50,6 +50,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         }
         ctx.wizard.state.wallet =  ctx.message.text;
         let wrk= Object.keys(response.data.performance.workers);
+        if (wrk[0]=='') wrk[0] = 'default';
         ctx.reply('Ваши воркеры: ' + wrk);
         ctx.reply('Выберите нужный в правом меню ➰', Markup.keyboard(wrk).oneTime().resize())
         return ctx.wizard.next();        
@@ -105,11 +106,12 @@ const chengeSubscribe = new Scenes.WizardScene(
       //Проверка на существующий воркер ----------------------------
       if (ctx.wizard.state.curWorkerIndex!=undefined){
         ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashLevel = ctx.message.text;
-        ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].delivered = flase;
+        ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].delivered = false;
         let text='';
         let item = ctx.wizard.state.workers;
+   
         for(let i=0; i<item.length; i++){
-          text += '- ' + item[i].name +' ограничение: ' + item[i].hashLevel +' '+ item[i].hashDev + ',\n'
+          text += `${i+1}) «`+ item[i].name +'» : ограничение - ' + item[i].hashLevel +' '+ item[i].hashDev + `, оповещение: «${item[i].delivered? 'отключено':'включено'}` + '»;\n'
         }
         ctx.reply('<b>Ваши новые данные:</b>\n' +
           'Монета: '  + '<i>' + ctx.wizard.state.poolId + '</i>' + '\n' +
@@ -123,7 +125,7 @@ const chengeSubscribe = new Scenes.WizardScene(
             ctx.reply('Подписаться?', {
               parse_mode: 'HTML',
               ...Markup.inlineKeyboard([
-                { text: "Да'", callback_data: "subHash" }, 
+                { text: "Да", callback_data: "subHash" }, 
                 { text: "Нет", callback_data: "back" }
               ])
             }) 
@@ -153,11 +155,15 @@ const chengeSubscribe = new Scenes.WizardScene(
 );
 
 chengeSubscribe.action('chooseCoin',  (ctx)=>{
+  ctx.wizard.state.wallet = null;
+  ctx.wizard.state.workers = [];
   ctx.wizard.steps[1](ctx);
   console.log('cursor: ', ctx.wizard.cursor);
 });
 
 chengeSubscribe.action('chooseWallet',  (ctx)=>{
+  ctx.wizard.state.wallet = null;
+  ctx.wizard.state.workers = [];
   ctx.reply('Введите кошелек:')
   ctx.wizard.selectStep(2);
   console.log('cursor: ', ctx.wizard.cursor);
@@ -221,7 +227,7 @@ chengeSubscribe.action('chooseEth', (ctx)=>{
   ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
-      { text: "Да'", callback_data: 'subBlockEth' }, 
+      { text: "Да", callback_data: 'subBlockEth' }, 
       { text: "Нет", callback_data: 'notSubBlockEth' }
     ])
   }) 
@@ -231,6 +237,7 @@ chengeSubscribe.action('chooseEth', (ctx)=>{
 chengeSubscribe.action('subBlockEth',  (ctx)=>{
   ctx.wizard.state.block = 'да'
   ctx.reply('Введите ethereum кошелек:');
+  return ctx.wizard.next(); 
 });
 
 chengeSubscribe.action('notSubBlockEth',  (ctx)=>{
@@ -252,6 +259,7 @@ chengeSubscribe.action('chooseErgo',  (ctx)=>{
 chengeSubscribe.action('subBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'да'
   ctx.reply('Введите ergo кошелек:');
+  return ctx.wizard.next(); 
 });
 
 chengeSubscribe.action('notSubBlockErgo',  (ctx)=>{

@@ -62,7 +62,7 @@ function getBlock(){
   axios({
     url: api,
     method: 'get',
-    timeout: 1000
+    timeout: 2000
   })
   .then(res => {
   let currBlock = res.data[0];
@@ -127,7 +127,7 @@ function  getHash(){
     axios({
       url: api2 + '/api/pools/' + item.poolId + '/miners/' + item.wallet,
       method: 'get',
-      timeout: 1000})
+      timeout: 2000})
     .then((response)=> {
       // handle success
       let allWorkers = response.data.performance.workers;
@@ -135,15 +135,17 @@ function  getHash(){
       console.log('allWorkers:', allWorkers);
       console.log('controlledWorkers:', item.workers);
       controlledWorkers.forEach(itemCW=>{
+        if (itemCW.name=='default') itemCW.name= '';
         let itemAWhash = allWorkers[itemCW.name].hashrate;
+        console.log('itemAWhash>>>>>', itemAWhash);
         if (itemAWhash!=undefined){
           let itemPorog = itemCW.hashLevel*koeff(itemCW.hashDev)
           if (itemAWhash<itemPorog && itemCW.delivered==false){    
                 bot.telegram.sendMessage(item.userId,
                   '<b>Предупреждение!</b>\n' +
-                  'Хешрейт  кошелека\n' +
+                  'Хешрейт  кошелька\n' +
                   '<i>' + item.wallet  + '</i>' + ' \n' +
-                  'с воркером '   + '<i>' +  itemCW.name + '</i>' + '\n' +
+                  'с воркером '   + '<i>' +  `${itemCW.name ==''? 'default': itemCW.name}` + '</i>' + '\n' +
                   'опустился ниже установленного в ' + '<i>' +  itemCW.hashLevel + '</i>'  +' ' + '<i>' +  itemCW.hashDev + '</i>\n' +
                   'и составляет ' + '<i>' +  formatHashrate(itemAWhash)+ '</i>\n\n' +
                   '<b>ВНИМАНИЕ! Оповещение об уровне хешрейта отключено.</b>\n' +

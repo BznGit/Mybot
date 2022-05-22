@@ -30,7 +30,9 @@ const subscribe = new Scenes.WizardScene(
           return
         }
         ctx.wizard.state.wallet =  ctx.message.text;
+        
         let wrk= Object.keys(response.data.performance.workers);
+        if (wrk[0]=='') wrk[0] = 'default';
         ctx.reply('Ваши воркеры: ' + wrk);
         ctx.reply('Выберите нужный в правом меню ➰', Markup.keyboard(wrk).oneTime().resize())
         return ctx.wizard.next();        
