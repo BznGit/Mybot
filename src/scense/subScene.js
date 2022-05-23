@@ -47,7 +47,8 @@ const subscribe = new Scenes.WizardScene(
       })    
     }, 
     (ctx) => {
-      //Здесь сделать проверку воркеров !!!!!!!
+      //Здесь сделать проверку воркеров !!!!!!! Сделать обработчики ошибок
+      
       ctx.wizard.state.worker = {
         name: ctx.message.text,
         hashLevel: null,
