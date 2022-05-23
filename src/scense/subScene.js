@@ -34,7 +34,9 @@ const subscribe = new Scenes.WizardScene(
         let wrk= Object.keys(response.data.performance.workers);
         if (wrk[0]=='') wrk[0] = 'default';
         ctx.reply('Ваши воркеры: ' + wrk);
-        ctx.reply('Выберите нужный в правом меню ➰', Markup.keyboard(wrk).oneTime().resize())
+        ctx.reply('Выберите нужный на выпадающей клавиатуре:',
+          Markup.keyboard(wrk,{ wrap: (btn, index, currentRow) => currentRow.length >=4 })
+          .oneTime().resize())
         return ctx.wizard.next();        
          
       }).catch(function (error) {
@@ -45,13 +47,14 @@ const subscribe = new Scenes.WizardScene(
       })    
     }, 
     (ctx) => {
+      //Здесь сделать проверку воркеров !!!!!!!
       ctx.wizard.state.worker = {
         name: ctx.message.text,
         hashLevel: null,
         hashDev: null,
         delivered: false
       }
-      ctx.reply('Выберите размерность граничного уровня хешрейта:', {
+      ctx.reply('Выберите размерность порогового уровня хешрейта:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
         [{ text: "KH/s", callback_data: "chooseK" }, { text: "MH/s", callback_data: "chooseM" },{ text: "GH/s", callback_data: "chooseG" }],
@@ -133,34 +136,23 @@ subscribe.action('notSubBlockErgo',  (ctx)=>{
 
 subscribe.action('chooseK',  (ctx)=>{
   ctx.wizard.state.worker.hashDev = 'KH/s'
-  ctx.reply('Введите значение критического уровня хашрейта:');
+  ctx.reply('Введите значение порогового уровня хашрейта в KH/s:');
 });
 subscribe.action('chooseM',  (ctx)=>{
   ctx.wizard.state.worker.hashDev = 'MH/s'
-  ctx.reply('Введите значение критического уровня хашрейта:');
+  ctx.reply('Введите значение порогового уровня хашрейта в MH/s:');
 });
 subscribe.action('chooseG',  (ctx)=>{
   ctx.wizard.state.worker.hashDev = 'GH/s'
-  ctx.reply('Введите значение критического уровня хашрейта:');
+  ctx.reply('Введите значение порогового уровня хашрейта в GH/s:');
 });
 subscribe.action('chooseT',  (ctx)=>{
   ctx.wizard.state.worker.hashDev = 'TH/s'
-  ctx.reply('Введите значение критического уровня хашрейта:');
+  ctx.reply('Введите значение порогового уровня хашрейта в TH/s:');
 });
 subscribe.action('chooseP',  (ctx)=>{
   ctx.wizard.state.worker.hashDev = 'PH/s'
-  ctx.reply('Введите значение критического уровня хашрейта:');
-});
-
-subscribe.action('setHash', (ctx)=>{
-  return ctx.reply('Введите пороговый уровень хешрейта:', {
-    parse_mode: 'HTML',
-    ...Markup.inlineKeyboard([
-      Markup.button.callback('Далее', 'subscrcribeHash'),
-      Markup.button.callback('Отписаться', 'unsubscribeHash'),
-      Markup.button.callback('Назад', 'back')
-    ])
-  })
+  ctx.reply('Введите значение порогового уровня хашрейта в PH/s:');
 });
 
 subscribe.action('subHash', (ctx)=>{

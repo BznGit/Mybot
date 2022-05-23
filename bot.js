@@ -13,7 +13,7 @@ const {formatHashrate} = require('./src/libs/utils.js');
 const {koeff} = require('./src/libs/utils.js');
 // Создаем менеджера сцен
 const stage = new Scenes.Stage();
-
+bot.on
 // Регистрируем сцену создания матча
 stage.register( home, subscribe, unSubscribe, chengeSubscribe);
 begin();
@@ -118,7 +118,7 @@ function getBlock(){
   })
   .catch(error => {
   console.error('API Erorr: ', error);
-  bot.telegram.sendMessage(settings.adminId, 'Ошибка AXIOS запроса:\n' + error)
+  bot.telegram.sendMessage(settings.adminId, 'Ошибка AXIOS-1 запроса:\n' + error)
   })
 };
 
@@ -157,8 +157,6 @@ function  getHash(){
         }
         
       })
-     
-      
     
       if (response.data.performance == undefined){
         console.log('Ошибка опроса хешрейта!');

@@ -9,12 +9,15 @@ const home = new Scenes.WizardScene(
       let currUser = users.find(item=>item.userId == ctx.chat.id);
      // console.log('Current user: ', currUser)
       if (currUser == undefined){
-        return ctx.reply('Добро пожаловать в бот, который может Вас оповещать о появлении нового блока и падении текущего хешрейта:', {
+        try{
+           return ctx.reply('Добро пожаловать в бот, который может Вас оповещать о появлении нового блока и падении текущего хешрейта:', {
           parse_mode: 'HTML',
           ...Markup.inlineKeyboard([
               Markup.button.callback('Подписаться на оповещение', 'onSub'),    
             ])
-        }) 
+        })
+        }catch(err){console.log('wswss>>>',err)}
+        
       }
       else
       {
@@ -23,21 +26,25 @@ const home = new Scenes.WizardScene(
         for(let i=0; i<item.length; i++){
           text += `${i+1}) «`+ `${item[i].name ==''? 'default': item[i].name}` +'» : ограничение - ' + item[i].hashLevel +' '+ item[i].hashDev + `, оповещение: «${item[i].delivered? 'отключено':'включено'}` + '»;\n'
         }
-        ctx.reply('<b>Вы подписаны на оповещение с параметрами:</b>\n' +
-          'Монета: '  + '<i>' + currUser.poolId + '</i>' + '\n' +
-          'Оповещение о новом блоке: ' + '<i>' + currUser.block + '</i>\n' +
-          'Кошелек: ' + '<i>' + currUser.wallet + '</i>' + ',\n' +
-          'Воркеры: \n'  + text + 
-                  
-          '<b>Выберите:</b>',  {
-            parse_mode: 'HTML',
-            ...Markup.inlineKeyboard([
-                Markup.button.callback('Отписаться от оповещения', 'unSub'),
-                Markup.button.callback('Изменить параметры оповещения', 'chengeSub'),
-              ])
-          });
+        try{
+          ctx.reply('<b>Вы подписаны на оповещение с параметрами:</b>\n' +
+            'Монета: '  + '<i>' + currUser.poolId + '</i>' + '\n' +
+            'Оповещение о новом блоке: ' + '<i>' + currUser.block + '</i>\n' +
+            'Кошелек: ' + '<i>' + currUser.wallet + '</i>' + ',\n' +
+            'Воркеры: \n'  + text + 
+                    
+            '<b>Выберите:</b>',  {
+              parse_mode: 'HTML',
+              ...Markup.inlineKeyboard([
+                  Markup.button.callback('Отписаться от оповещения', 'unSub'),
+                  Markup.button.callback('Изменить параметры оповещения', 'chengeSub'),
+                ])
+            });
+        }catch(err){
+          console.log('Ошибка пользователя: ', err)
+        }
 
-     }   
+     } 
 });
   
  

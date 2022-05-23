@@ -52,7 +52,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         let wrk= Object.keys(response.data.performance.workers);
         if (wrk[0]=='') wrk[0] = 'default';
         ctx.reply('Ваши воркеры: ' + wrk);
-        ctx.reply('Выберите нужный в правом меню ➰', Markup.keyboard(wrk).oneTime().resize())
+        ctx.reply('Выберите нужный на выпадающей клавиатуре:', Markup.keyboard(wrk).oneTime().resize())
         return ctx.wizard.next();        
          
       }).catch(function (error) {
@@ -86,7 +86,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         ctx.wizard.state.tempWorker = worker;
         console.log('---->', ctx.wizard.state.workers);
       }
-      ctx.reply('Выберите размерность граничного уровня хешрейта:', {
+      ctx.reply('Выберите размерность порогового уровня хешрейта:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
           [{ text: "KH/s", callback_data: "chooseK" },{ text: "MH/s", callback_data: "chooseM" },{ text: "GH/s", callback_data: "chooseG" }],
@@ -183,7 +183,10 @@ chengeSubscribe.action('chooseWorker',  (ctx)=>{
     console.log('cursor: ', ctx.wizard.cursor);
     let wrk= Object.keys(response.data.performance.workers);
     ctx.reply('Ваши воркеры: ' + wrk);
-    ctx.reply('Выберите нужный в правом меню ➰', Markup.keyboard(wrk).oneTime().resize())
+    ctx.reply('Выберите нужный на выпадающей клавиатуре:',
+      Markup.keyboard(wrk,{ wrap: (btn, index, currentRow) => currentRow.length >=4 })
+      .oneTime().resize())
+    
     return ctx.wizard.next();        
      
   }).catch(function (error) {
@@ -271,44 +274,33 @@ chengeSubscribe.action('chooseK',  (ctx)=>{
   if (ctx.wizard.state.curWorkerIndex!==undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'KH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'KH/s';
-  ctx.reply('Введите значение критического уровня хашрейта:');
+  ctx.reply('Введите значение порогового уровня хашрейта в KH/s:');
 });
 chengeSubscribe.action('chooseM',  (ctx)=>{
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'MH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'MH/s';
-  ctx.reply('Введите значение критического уровня хашрейта:');
+  ctx.reply('Введите значение порогового уровня хашрейта в MH/s:');
 });
 chengeSubscribe.action('chooseG',  (ctx)=>{
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'GH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'GH/s';
-  ctx.reply('Введите значение критического уровня хашрейта:');
+  ctx.reply('Введите значение порогового уровня хашрейта в GH/s:');
 });
 chengeSubscribe.action('chooseT',  (ctx)=>{
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'TH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'TH/s';
-  ctx.reply('Введите значение критического уровня хашрейта:');
+  ctx.reply('Введите значение порогового уровня хашрейта в TH/s:');
   });
 chengeSubscribe.action('chooseP',  (ctx)=>{
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'PH/s';
   else  ctx.wizard.state.tempWorker.hashDev  = 'PH/s';
-  ctx.reply('Введите значение критического уровня хашрейта:');
+  ctx.reply('Введите значение порогового уровня хашрейта в PH/s:');
 });
 //---------------------------------------------------------------
-
-chengeSubscribe.action('setHash', (ctx)=>{
-  return ctx.reply('Введите пороговый уровень хешрейта:', {
-    parse_mode: 'HTML',
-    ...Markup.inlineKeyboard([
-      Markup.button.callback('Далее', 'subscrcribeHash'),
-      Markup.button.callback('Отписаться', 'unsubscribeHash'),
-      Markup.button.callback('Назад', 'back')
-    ])
-  })
-});
 
 chengeSubscribe.action('subHash', async(ctx)=>{
   if(ctx.wizard.state.tempWorker!=undefined){
