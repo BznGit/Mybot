@@ -108,7 +108,7 @@ const chengeSubscribe = new Scenes.WizardScene(
     },     
     // step #4      
     (ctx) => {
-      let regexp = /[0-9]+/;
+      let regexp = /^[0-9]+$/;
       if(!regexp.test(ctx.message.text)){
         ctx.reply('Введите число!');
         return 
