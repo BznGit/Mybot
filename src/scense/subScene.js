@@ -34,8 +34,12 @@ const subscribe = new Scenes.WizardScene(
         let wrk = Object.keys(response.data.performance.workers);
         ctx.wizard.state.tempWorkerNames = wrk;
         if (wrk[0]=='') wrk[0] = 'default';
-        ctx.reply('Ваши воркеры: ' + wrk);
-        ctx.reply('Выберите нужный на выпадающей клавиатуре:',
+        let text='';
+        for(let i=0; i<wrk.length; i++){
+          text += `${i+1}) «`+ `${wrk[i]}` +'»\n'
+        }
+        ctx.reply('Ваши воркеры:\n' + text);
+        ctx.reply('Выберите нужный на выпадающей клавиатуре или наберите вручную:',
           Markup.keyboard(wrk,{ wrap: (btn, index, currentRow) => currentRow.length >=4 })
           .oneTime().resize())
         return ctx.wizard.next();        
@@ -49,11 +53,9 @@ const subscribe = new Scenes.WizardScene(
     }, 
     (ctx) => {
       //Здесь сделать проверку воркеров !!!!!!! Сделать обработчики ошибок
-      let  temWorkerName =  ctx.wizard.state.tempWorkerNames.findIndex(item=>item == ctx.message.text);
-      console.log('ctx.wizard.state.tempWorkerNames>>',ctx.wizard.state.tempWorkerNames);
-      console.log('temWorkerName>>',temWorkerName);
-      if (temWorkerName=-1){
-        ctx.reply(`Воркера "${ctx.message.text}" не существует!`);
+   
+      if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text)){
+        ctx.reply(`Воркера «${ctx.message.text}» не существует!`);
         return 
       }
       ctx.wizard.state.worker = {
@@ -75,9 +77,9 @@ const subscribe = new Scenes.WizardScene(
     },     
 
     (ctx) => {
-      let regexp = /[0-9]/;
+      let regexp = /[0-9]+/;
       if(!regexp.test(ctx.message.text)){
-        ctx.reply('введите число!');
+        ctx.reply('Введите число!');
         return 
       } 
       ctx.wizard.state.worker.hashLevel =  ctx.message.text;

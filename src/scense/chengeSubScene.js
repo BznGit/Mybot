@@ -53,8 +53,12 @@ const chengeSubscribe = new Scenes.WizardScene(
         let wrk= Object.keys(response.data.performance.workers);
         ctx.wizard.state.tempWorkerNames = wrk;
         if (wrk[0]=='') wrk[0] = 'default';
-        ctx.reply('Ваши воркеры: ' + wrk);
-        ctx.reply('Выберите нужный на выпадающей клавиатуре:', Markup.keyboard(wrk).oneTime().resize())
+        let text='';
+        for(let i=0; i<wrk.length; i++){
+          text += `${i+1}) «`+ `${wrk[i]}` +'»\n'
+        }
+        ctx.reply('Ваши воркеры:\n' + text);
+        ctx.reply('Выберите нужный на выпадающей клавиатуре или наберите вручную:', Markup.keyboard(wrk).oneTime().resize())
         return ctx.wizard.next();        
          
       }).catch(function (error) {
@@ -66,11 +70,8 @@ const chengeSubscribe = new Scenes.WizardScene(
     }, 
     // step #3
     (ctx) => {
-
-      let  temWorkerName =  ctx.wizard.state.tempWorkerNames.findIndex(item=>item == ctx.message.text);
-      console.log('temWorkerName>>',temWorkerName)
-      if (temWorkerName=-1){
-        ctx.reply(`Воркера "${ctx.message.text}" не существует!`);
+      if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text)){
+        ctx.reply(`Воркера «${ctx.message.text}» не существует!`);
         return 
       }
       let currWorkers = ctx.wizard.state.workers;
@@ -84,6 +85,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         console.log('---->',ctx.wizard.state.curWorkerIndex);
  
       } else {
+        
         let worker = {
           name: ctx.message.text,
           hashLevel: null,
@@ -106,9 +108,9 @@ const chengeSubscribe = new Scenes.WizardScene(
     },     
     // step #4      
     (ctx) => {
-      let regexp = /[0-9]/;
+      let regexp = /[0-9]+/;
       if(!regexp.test(ctx.message.text)){
-        ctx.reply('введите число!');
+        ctx.reply('Введите число!');
         return 
       } 
       //Проверка на существующий воркер ----------------------------
@@ -190,8 +192,13 @@ chengeSubscribe.action('chooseWorker',  (ctx)=>{
     ctx.wizard.selectStep(2);
     console.log('cursor: ', ctx.wizard.cursor);
     let wrk= Object.keys(response.data.performance.workers);
-    ctx.reply('Ваши воркеры: ' + wrk);
-    ctx.reply('Выберите нужный на выпадающей клавиатуре:',
+    ctx.wizard.state.tempWorkerNames = wrk;
+    let text='';
+    for(let i=0; i<wrk.length; i++){
+      text += `${i+1}) «`+ `${wrk[i]}` +'»\n'
+    }
+    ctx.reply('Ваши воркеры:\n' + text);
+    ctx.reply('Выберите нужный на выпадающей клавиатуре или наберите вручную:',
       Markup.keyboard(wrk,{ wrap: (btn, index, currentRow) => currentRow.length >=4 })
       .oneTime().resize())
     
