@@ -49,7 +49,9 @@ const chengeSubscribe = new Scenes.WizardScene(
           return
         }
         ctx.wizard.state.wallet =  ctx.message.text;
+        
         let wrk= Object.keys(response.data.performance.workers);
+        ctx.wizard.state.tempWorkerNames = wrk;
         if (wrk[0]=='') wrk[0] = 'default';
         ctx.reply('Ваши воркеры: ' + wrk);
         ctx.reply('Выберите нужный на выпадающей клавиатуре:', Markup.keyboard(wrk).oneTime().resize())
@@ -64,7 +66,13 @@ const chengeSubscribe = new Scenes.WizardScene(
     }, 
     // step #3
     (ctx) => {
-      
+
+      let  temWorkerName =  ctx.wizard.state.tempWorkerNames.findIndex(item=>item == ctx.message.text);
+      console.log('temWorkerName>>',temWorkerName)
+      if (temWorkerName=-1){
+        ctx.reply(`Воркера "${ctx.message.text}" не существует!`);
+        return 
+      }
       let currWorkers = ctx.wizard.state.workers;
       let choosedWorker = ctx.message.text;
       console.log('choosedWorker>',choosedWorker);

@@ -31,7 +31,8 @@ const subscribe = new Scenes.WizardScene(
         }
         ctx.wizard.state.wallet =  ctx.message.text;
         
-        let wrk= Object.keys(response.data.performance.workers);
+        let wrk = Object.keys(response.data.performance.workers);
+        ctx.wizard.state.tempWorkerNames = wrk;
         if (wrk[0]=='') wrk[0] = 'default';
         ctx.reply('Ваши воркеры: ' + wrk);
         ctx.reply('Выберите нужный на выпадающей клавиатуре:',
@@ -48,7 +49,13 @@ const subscribe = new Scenes.WizardScene(
     }, 
     (ctx) => {
       //Здесь сделать проверку воркеров !!!!!!! Сделать обработчики ошибок
-      
+      let  temWorkerName =  ctx.wizard.state.tempWorkerNames.findIndex(item=>item == ctx.message.text);
+      console.log('ctx.wizard.state.tempWorkerNames>>',ctx.wizard.state.tempWorkerNames);
+      console.log('temWorkerName>>',temWorkerName);
+      if (temWorkerName=-1){
+        ctx.reply(`Воркера "${ctx.message.text}" не существует!`);
+        return 
+      }
       ctx.wizard.state.worker = {
         name: ctx.message.text,
         hashLevel: null,
