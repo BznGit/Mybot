@@ -2,7 +2,7 @@ const fs = require('fs');
 const axios = require('axios');
 const settings = require('../../botSettings.json');
 const api = settings.MiningCoreApiEndpoints;
-const users = require('../controls/users.json');
+const users = require('../storage/users.json');
 const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.
@@ -338,7 +338,7 @@ chengeSubscribe.action('subHash', async(ctx)=>{
     users.push(newUser);
     console.log('User chenged: ', newUser);
     console.log('All current users: ', users);
-    fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
+    fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
    await  ctx.reply('Ваши данные изменены!');
    ctx.scene.enter("homeSceneWizard");
   }

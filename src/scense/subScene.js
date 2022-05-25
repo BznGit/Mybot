@@ -2,7 +2,7 @@ const fs = require('fs');
 const axios = require('axios');
 const settings = require('../../botSettings.json');
 const api = settings.MiningCoreApiEndpoints;
-const users = require('../controls/users.json');
+const users = require('../storage/users.json');
 const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.
@@ -66,12 +66,10 @@ const subscribe = new Scenes.WizardScene(
       }
       ctx.reply('Выберите размерность порогового уровня хешрейта:', {
         parse_mode: 'HTML',
-        ...Markup.inlineKeyboard([
-        [{ text: "KH/s", callback_data: "chooseK" }, { text: "MH/s", callback_data: "chooseM" },{ text: "GH/s", callback_data: "chooseG" }],
-        [{ text: "TH/s", callback_data: "chooseT" }, { text: "PH/s", callback_data: "chooseP" }],      
-        ])
-        
-           
+          ...Markup.inlineKeyboard([
+          [{ text: "KH/s", callback_data: "chooseK" }, { text: "MH/s", callback_data: "chooseM" },{ text: "GH/s", callback_data: "chooseG" }],
+          [{ text: "TH/s", callback_data: "chooseT" }, { text: "PH/s", callback_data: "chooseP" }],      
+        ])          
       })
       return ctx.wizard.next(); 
     },     
@@ -178,7 +176,7 @@ subscribe.action('subHash', (ctx)=>{
   console.log('Added user: ', curUser);
   users.push(curUser);
   console.log("All users id: ", users); 
-  fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
+  fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
   return ctx.scene.enter("homeSceneWizard")  
 
 });

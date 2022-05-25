@@ -8,7 +8,7 @@ const home = require('./src/scense/homeScene');
 const unSubscribe = require('./src/scense/unSubScene');
 const subscribe = require('./src/scense/subScene');
 const chengeSubscribe = require('./src/scense/chengeSubScene');
-const users = require('./src/controls/users.json');
+const users = require('./src/storage/users.json');
 const {formatHashrate} = require('./src/libs/utils.js');
 const {koeff} = require('./src/libs/utils.js');
 // Создаем менеджера сцен

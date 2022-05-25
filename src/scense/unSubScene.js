@@ -1,5 +1,5 @@
 const fs = require('fs');
-const users = require('../controls/users.json');
+const users = require('../storage/users.json');
 const settings = require('../../botSettings.json');
 const {WizardScene, Scenes, Markup} = require("telegraf");
 // Сцена создания нового матча.
@@ -25,7 +25,7 @@ const unSubscribe = new Scenes.WizardScene(
       users.splice(index, index+1);
       console.log('User deleted: ', delUser);
       console.log('All current users: ', users);
-      fs.writeFileSync('./src/controls/users.json', JSON.stringify(users));
+      fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
       await ctx.reply('Вы отписались от всех оповещений!');
       return ctx.scene.enter("homeSceneWizard")  
     }

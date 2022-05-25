@@ -1,5 +1,5 @@
 const fs = require('fs');
-const users = require('../controls/users.json');
+const users = require('../storage/users.json');
 const {WizardScene, Scenes, Markup} = require("telegraf");
 // Сцена создания нового матча.
 const home = new Scenes.WizardScene(
