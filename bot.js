@@ -108,7 +108,7 @@ function getBlock(){
                 bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о новом блоке! \n' + err);
               }
             }
-            temptBlock = {
+            tempBlock = {
               blockHeight: currBlock.blockHeight,
               status: currBlock.status
             } 

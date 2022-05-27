@@ -104,8 +104,8 @@ const subscribe = new Scenes.WizardScene(
       ctx.reply('Подписаться?', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
-          Markup.button.callback('Да', 'subHash'),
-          Markup.button.callback('Нет', 'back')
+          { text: "Да", callback_data: 'subHash' }, 
+          { text: "Нет", callback_data: 'back' }
         ])
       })
     )      
@@ -116,8 +116,8 @@ subscribe.action('chooseEth', (ctx)=>{
   ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
-      Markup.button.callback('Да', 'subBlockEth'),
-      Markup.button.callback('Нет', 'notSubBlockEth')
+      { text: "Да", callback_data: 'subBlockEth' }, 
+      { text: "Нет", callback_data: 'notSubBlockEth' }
     ])
   }) 
 });
@@ -137,7 +137,7 @@ subscribe.action('chooseErgo',  (ctx)=>{
   ctx.reply('Подписаться на оповещение о новом блоке ergo?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
-      { text: "Да'", callback_data: 'subBlockErgo' }, 
+      { text: "Да", callback_data: 'subBlockErgo' }, 
       { text: "Нет", callback_data: 'notSubBlockErgo' }
     ])
   }) 
