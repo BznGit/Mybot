@@ -28,6 +28,8 @@ bot.start((ctx) =>{
 
 // Запуск бота
 bot.launch();
+
+bot.on()
 var lastBlock = null;
 var tempBlock  =null;
 function start(){

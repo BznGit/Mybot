@@ -7,109 +7,109 @@ const { Scenes, Markup } = require("telegraf");
 
 // Сцена создания нового матча.
 const subscribe = new Scenes.WizardScene(
-    "subSceneWizard", // Имя сцены
-     (ctx) => {
-      ctx.wizard.state.stepError=false; 
-      ctx.reply('Выберите монету:', {
-        parse_mode: 'HTML',
-        ...Markup.inlineKeyboard([
-          Markup.button.callback ('Ethereum','chooseEth'),
-          Markup.button.callback('Ergo', 'chooseErgo'),        
-        ])    
-      })
-      return ctx.wizard.next(); 
-    },
-    
+  "subSceneWizard", // Имя сцены
     (ctx) => {
-       axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text)
-      .then((response)=> {
-        // handle success
-        //console.log(response.data.performance);
-        if (response.data.performance == undefined){
-          ctx.reply('Такого кошелька нет!');
-          ctx.reply('Введите кошелек заново');
-          return
-        }
-        ctx.wizard.state.wallet =  ctx.message.text;
-        
-        let wrk = Object.keys(response.data.performance.workers);
-        ctx.wizard.state.tempWorkerNames = wrk;
-        if (wrk[0]=='') wrk[0] = 'default';
-        let text='';
-        for(let i=0; i<wrk.length; i++){
-          text += `${i+1}) «`+ `${wrk[i]}` +'»\n'
-        }
-        ctx.reply('Ваши воркеры:\n' + text);
-        ctx.reply('Выберите нужный на выпадающей клавиатуре или наберите вручную:',
-          Markup.keyboard(wrk,{ wrap: (btn, index, currentRow) => currentRow.length >=4 })
-          .oneTime().resize())
-        return ctx.wizard.next();        
-         
-      }).catch(function (error) {
-        // handle error
-        console.log('Ошибка запроса при регистрации кошелька: ', error);
-        ctx.reply('Введены неверные данные попробуйте еще раз!');
+    ctx.wizard.state.stepError=false; 
+    ctx.reply('Выберите монету:', {
+      parse_mode: 'HTML',
+      ...Markup.inlineKeyboard([
+        Markup.button.callback ('Ethereum','chooseEth'),
+        Markup.button.callback('Ergo', 'chooseErgo'),        
+      ])    
+    })
+    return ctx.wizard.next(); 
+  },
+  
+  (ctx) => {
+      axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text)
+    .then((response)=> {
+      // handle success
+      //console.log(response.data.performance);
+      if (response.data.performance == undefined){
+        ctx.reply('Такого кошелька нет!');
+        ctx.reply('Введите кошелек заново');
         return
-      })   
-      
-    }, 
-    (ctx) => {
-      //Здесь сделать проверку воркеров !!!!!!! Сделать обработчики ошибок
-   
-      if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text) && !ctx.wizard.state.stepError){
-        ctx.reply(`Воркера «${ctx.message.text}» не существует!`);
-        return 
       }
-      ctx.wizard.state.worker = {
-        name: ctx.message.text,
-        hashLevel: null,
-        hashDev: null,
-        delivered: false
-      }
-      ctx.wizard.state.stepError = true;
-      ctx.reply('Выберите размерность порогового уровня хешрейта:', {
-        parse_mode: 'HTML',
-          ...Markup.inlineKeyboard([
-          [{ text: "KH/s", callback_data: "chooseK" }, { text: "MH/s", callback_data: "chooseM" },{ text: "GH/s", callback_data: "chooseG" }],
-          [{ text: "TH/s", callback_data: "chooseT" }, { text: "PH/s", callback_data: "chooseP" }],      
-        ])          
-      })
-      return ctx.wizard.next(); 
-    },     
-
-    (ctx) => {
-
-      if (ctx.wizard.state.stepError) {
-        ctx.reply('Выберите кнопками выше!'); 
-        ctx.wizard.state.stepError = true;
-        return 
-      } 
+      ctx.wizard.state.wallet =  ctx.message.text;
       
-      let regexp = /^[0-9]+$/;
-      if(!regexp.test(ctx.message.text)){
-        ctx.reply('Введите число!');
-        return 
-      } 
+      let wrk = Object.keys(response.data.performance.workers);
+      ctx.wizard.state.tempWorkerNames = wrk;
+      if (wrk[0]=='') wrk[0] = 'default';
+      let text='';
+      for(let i=0; i<wrk.length; i++){
+        text += `${i+1}) «`+ `${wrk[i]}` +'»\n'
+      }
+      ctx.reply('Ваши воркеры:\n' + text);
+      ctx.reply('Выберите нужный на выпадающей клавиатуре или наберите вручную:',
+        Markup.keyboard(wrk,{ wrap: (btn, index, currentRow) => currentRow.length >=4 })
+        .oneTime().resize())
+      return ctx.wizard.next();        
+        
+    }).catch(function (error) {
+      // handle error
+      console.log('Ошибка запроса при регистрации кошелька: ', error);
+      ctx.reply('Введены неверные данные попробуйте еще раз!');
+      return
+    })   
     
-      ctx.wizard.state.worker.hashLevel =  ctx.message.text;
-      ctx.wizard.state.worker.delivered = false;
-      ctx.reply('<b>Ваши данные:</b>\n'+ 
-        'Монета: '  + ctx.wizard.state.poolId + '\n' +
-        'Оповещение о новом блоке: '  + ctx.wizard.state.block + '\n' +
-        'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
-        'Воркер: '  + ctx.wizard.state.worker.name + '\n' +
-        'Оповещение об уровене хешрейта: '  + ctx.wizard.state.worker.hashLevel + ' ' + ctx.wizard.state.worker.hashDev,
-        {parse_mode: 'HTML'}
-      ).then(
-        ctx.reply('Подписаться?', {
+  }, 
+  (ctx) => {
+    //Здесь сделать проверку воркеров !!!!!!! Сделать обработчики ошибок
+  
+    if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text) && !ctx.wizard.state.stepError){
+      ctx.reply(`Воркера «${ctx.message.text}» не существует!`);
+      return 
+    }
+    ctx.wizard.state.worker = {
+      name: ctx.message.text,
+      hashLevel: null,
+      hashDev: null,
+      delivered: false
+    }
+    ctx.wizard.state.stepError = true;
+    ctx.reply('Выберите размерность порогового уровня хешрейта:', {
+      parse_mode: 'HTML',
+        ...Markup.inlineKeyboard([
+        [{ text: "KH/s", callback_data: "chooseK" }, { text: "MH/s", callback_data: "chooseM" },{ text: "GH/s", callback_data: "chooseG" }],
+        [{ text: "TH/s", callback_data: "chooseT" }, { text: "PH/s", callback_data: "chooseP" }],      
+      ])          
+    })
+    return ctx.wizard.next(); 
+  },     
+
+  (ctx) => {
+
+    if (ctx.wizard.state.stepError) {
+      ctx.reply('Выберите кнопками выше!'); 
+      ctx.wizard.state.stepError = true;
+      return 
+    } 
+    
+    let regexp = /^[0-9]+$/;
+    if(!regexp.test(ctx.message.text)){
+      ctx.reply('Введите число!');
+      return 
+    } 
+  
+    ctx.wizard.state.worker.hashLevel =  ctx.message.text;
+    ctx.wizard.state.worker.delivered = false;
+    ctx.reply('<b>Ваши данные:</b>\n'+ 
+      'Монета: '  + ctx.wizard.state.poolId + '\n' +
+      'Оповещение о новом блоке: '  + ctx.wizard.state.block + '\n' +
+      'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
+      'Воркер: '  + ctx.wizard.state.worker.name + '\n' +
+      'Оповещение об уровене хешрейта: '  + ctx.wizard.state.worker.hashLevel + ' ' + ctx.wizard.state.worker.hashDev,
+      {parse_mode: 'HTML'}
+    ).then(
+      ctx.reply('Подписаться?', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
           Markup.button.callback('Да', 'subHash'),
           Markup.button.callback('Нет', 'back')
         ])
       })
-      )      
-    }, 
+    )      
+  } 
 );
 subscribe.action('chooseEth', (ctx)=>{
   ctx.wizard.state.poolId = 'ethpool';
