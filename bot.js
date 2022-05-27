@@ -13,13 +13,11 @@ const {formatHashrate} = require('./src/libs/utils.js');
 const {koeff} = require('./src/libs/utils.js');
 // Создаем менеджера сцен
 const stage = new Scenes.Stage();
-bot.on
-// Регистрируем сцену создания матча
 stage.register( home, subscribe, unSubscribe, chengeSubscribe);
 begin();
 bot.use(session());
 bot.use(stage.middleware());
-//bot.use(require('./src/composers/api.composer'));
+
 bot.start((ctx) =>{
   if (ctx.from.id != settings.adminId && ctx.chat.type =='group'){
     ctx.reply('У Вас недостаточно прав для выполнения этой команды');
@@ -30,22 +28,13 @@ bot.start((ctx) =>{
 
 // Запуск бота
 bot.launch();
-
-
-
 var lastBlock = null;
 var tempBlock  =null;
 function start(){
   setInterval(getBlock, settings.monitoringPeriodSec*1000);
   setInterval(getHash, settings.monitoringPeriodSec*1000)
-  console.log('Monitoring started');
+  console.log('Bot started');
 };
-//Остановка опроса API
-
-function stop(){
-  clearInterval(getInfo)
-  console.log('Monitoring stoped');
-}
 
 //Получение номера последнего блока
 function begin(){
@@ -63,27 +52,31 @@ function getBlock(){
     url: api,
     method: 'get',
     timeout: 2000
-  })
-  .then(res => {
-  let currBlock = res.data[0];
+  }).then(res => {
+    let currBlock = res.data[0];
     if (tempBlock != null){   
       if (currBlock.blockHeight==tempBlock.blockHeight && currBlock.status=='confirmed'){
-        console.log('Active users:', users);
+        //console.log('Active users:', users);
         if (users.length!=0){        
           users.forEach(item => {
             if (item.block =='да'){
-              console.log('Message sended!')
-              bot.telegram.sendMessage(item.userId,
-                "НОВЫЙ БЛОК ПОДТВЕРЖДЕН!"+"\n"+
-                "<b>Высота блока: </b>"  + currBlock.blockHeight +"\n" +
-                "<b>Сложность сети: </b>" + currBlock.networkDifficulty +"\n"+
-                "<b>Тип: </b>" + currBlock.type +"\n"+
-                "<b>Усилие: </b>" + Math.trunc(currBlock.effort*100)+"%" +"\n"+
-                "<b>Награда: </b>" + currBlock.reward +"\n"+
-                "<b>Ссылка: </b>" +    currBlock.infoLink +"\n"+
-                "<b>Майнер: </b>" +    currBlock.miner +"\n"+
-                "<b>Создан: </b>" +    currBlock.created, {parse_mode: 'HTML'}
-              ); 
+              try{
+                bot.telegram.sendMessage(item.userId,
+                  "НОВЫЙ БЛОК ПОДТВЕРЖДЕН!"+"\n"+
+                  "<b>Высота блока: </b>"  + currBlock.blockHeight +"\n" +
+                  "<b>Сложность сети: </b>" + currBlock.networkDifficulty +"\n"+
+                  "<b>Тип: </b>" + currBlock.type +"\n"+
+                  "<b>Усилие: </b>" + Math.trunc(currBlock.effort*100)+"%" +"\n"+
+                  "<b>Награда: </b>" + currBlock.reward +"\n"+
+                  "<b>Ссылка: </b>" +    currBlock.infoLink +"\n"+
+                  "<b>Майнер: </b>" +    currBlock.miner +"\n"+
+                  "<b>Создан: </b>" +    currBlock.created, {parse_mode: 'HTML'}
+                ); 
+                console.log('Отпрвалено сообщение о подтверждении блока пользователю: Id -', item.userId);
+              }catch(err){
+                console.log('Ошибка отправки сообщения о подтвержденном блоке! ', err);
+                bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о подтвержденном блоке \n' + err);
+              }
             }
           });
         }
@@ -94,31 +87,37 @@ function getBlock(){
         tempBlock = null;
       }
     } else {
-      if (lastBlock.blockHeight == currBlock.blockHeight){
-      if (users.length!=0){        
-        users.forEach(item => {
-          if (item.block =='да'){
-            console.log('Message sended');
-            bot.telegram.sendMessage(item.userId,
-              "НАЙДЕН НОВЫЙ БЛОК!"+"\n"+
-              "<b>Высота блока: </b>"  + currBlock.blockHeight +"\n" +
-              "<b>Сложность сети: </b>" + currBlock.networkDifficulty +"\n"+
-              "<b>Ссылка: </b>" +    currBlock.infoLink +"\n"+
-              "<b>Майнер: </b>" +    currBlock.miner +"\n", {parse_mode: 'HTML'}
-            );
-          }
-          temptBlock = {
-            blockHeight: currBlock.blockHeight,
-            status: currBlock.status
-          } 
-        });
+        if (lastBlock.blockHeight == currBlock.blockHeight){
+        if (users.length!=0){        
+          users.forEach(item => {
+            if (item.block =='да'){
+            
+              try{
+                bot.telegram.sendMessage(item.userId,
+                  "НАЙДЕН НОВЫЙ БЛОК!"+"\n"+
+                  "<b>Высота блока: </b>"  + currBlock.blockHeight +"\n" +
+                  "<b>Сложность сети: </b>" + currBlock.networkDifficulty +"\n"+
+                  "<b>Ссылка: </b>" +    currBlock.infoLink +"\n"+
+                  "<b>Майнер: </b>" +    currBlock.miner +"\n", {parse_mode: 'HTML'}
+                );
+                console.log('Отпрвалено сообщение о новом блоке пользователю: Id -', item.userId);
+              }catch(err){
+                console.log('Ошибка отправки сообщения о новом блоке! ', err);
+                bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о новом блоке! \n' + err);
+              }
+            }
+            temptBlock = {
+              blockHeight: currBlock.blockHeight,
+              status: currBlock.status
+            } 
+          });
+        }
       }
-    }
-  } 
+    } 
   })
   .catch(error => {
-  console.error('API Erorr: ', error);
-  bot.telegram.sendMessage(settings.adminId, 'Ошибка AXIOS-1 запроса:\n' + error)
+    console.error('API ERORR! Block request: ', error);
+    bot.telegram.sendMessage(settings.adminId, 'API ERORR! Block request: \n' + error);
   })
 };
 
@@ -129,48 +128,55 @@ function  getHash(){
       method: 'get',
       timeout: 2000})
     .then((response)=> {
-      // handle success
-      let allWorkers = response.data.performance.workers;
-      let controlledWorkers = item.workers;
-      console.log('allWorkers:', allWorkers);
-      console.log('controlledWorkers:', item.workers);
+      let allWorkers = response.data.performance.workers; // Все сущесивующие воркеры
+      let controlledWorkers = item.workers; // Все контрорлируемые воркеры
+      //Цикл проверки воркеров ---------------
       controlledWorkers.forEach(itemCW=>{
         if (itemCW.name=='default') itemCW.name= '';
-        let itemAWhash = allWorkers[itemCW.name].hashrate;
-        console.log('itemAWhash>>>>>', itemAWhash);
-        if (itemAWhash!=undefined){
-          let itemPorog = itemCW.hashLevel*koeff(itemCW.hashDev)
-          if (itemAWhash<itemPorog && itemCW.delivered==false){    
+          let itemAWhash = allWorkers[itemCW.name].hashrate;
+          if (itemAWhash!=undefined){
+            let itemPorog = itemCW.hashLevel*koeff(itemCW.hashDev)
+            if (itemAWhash<itemPorog && itemCW.delivered==false){    
+              try{
                 bot.telegram.sendMessage(item.userId,
                   '<b>Предупреждение!</b>\n' +
                   'Хешрейт  кошелька\n' +
                   '<i>' + item.wallet  + '</i>' + ' \n' +
-                  'с воркером '   + '<i>' +  `${itemCW.name ==''? 'default': itemCW.name}` + '</i>' + '\n' +
+                  'с воркером '   + '<i>«' +  `${itemCW.name ==''? 'default': itemCW.name}` + '</i>»' + '\n' +
                   'опустился ниже установленного в ' + '<i>' +  itemCW.hashLevel + '</i>'  +' ' + '<i>' +  itemCW.hashDev + '</i>\n' +
                   'и составляет ' + '<i>' +  formatHashrate(itemAWhash)+ '</i>\n\n' +
                   '<b>ВНИМАНИЕ! Оповещение об уровне хешрейта отключено.</b>\n' +
-                  'Для возобновления оповещения устовновите новый уровень хешрейта для этого воркера'
-                  , {parse_mode: 'HTML'}
+                  'Для возобновления оповещения устовновите новый уровень хешрейта для этого воркера', 
+                  {parse_mode: 'HTML'}
                 );
                 itemCW.delivered = true;
-          }
+                console.log('Отпрвалено сообщение о хешрейте пользователю: Id -', item.userId);
+              }catch(err){
+                console.log('Ошибка отправки сообщения о хешрейте! ', err);
+                bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о хешрейте!  \n' + err);
+              }
+              
+            }
+        }else{
+          bot.telegram.sendMessage(item.userId,           
+            'Воркер '   + '<i>«' +  `${itemCW.name ==''? 'default': itemCW.name}` + '»</i>' + ' для кошелька' +'\n' +
+             '<i>' + item.wallet  + '</i>' +'\n' +
+             'больше не существует',
+            {parse_mode: 'HTML'}
+          );
+          itemCW.delivered = true;
         }
-        
       })
-    
+      //-------------------------------------------
       if (response.data.performance == undefined){
         console.log('Ошибка опроса хешрейта!');
-      
         return
       }
-     
-      
-    }).catch(function (error) {
-      // handle error
-     console.log(error);
-
+    }).catch(function (error){
+       console.log('API ERORR! Hashrate request: ', error);
+       bot.telegram.sendMessage(settings.adminId, 'API ERORR! Block request: \n' + error);
       return
-    })
+     })
   })  
 }
 

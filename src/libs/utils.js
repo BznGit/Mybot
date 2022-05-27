@@ -9,7 +9,7 @@
   };
 
 let koeff = function(def){
-      let k = 1;
+    let k = 1;
     switch (def){
         case 'КH/s' : k = Math.pow(10, 3);
             break;

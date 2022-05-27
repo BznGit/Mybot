@@ -8,8 +8,9 @@ const { Scenes, Markup } = require("telegraf");
 // Сцена создания нового матча.
 const chengeSubscribe = new Scenes.WizardScene(
     "chengeSubSceneWizard", // Имя сцены
-    // step #0
+    // step #0 --------------------------------------------------
     (ctx)=>{
+ 
       let  curUser = users.find(item=>item.userId == ctx.chat.id);
       let tempArr = JSON.parse(JSON.stringify(curUser.workers));
 
@@ -26,7 +27,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         ]) 
       })  
     },
-    // step #1
+    // step #1 ---------------------------------------------------
     (ctx) => {
       ctx.reply('Выберите монету:', {
         parse_mode: 'HTML',
@@ -37,12 +38,12 @@ const chengeSubscribe = new Scenes.WizardScene(
       })
       return ctx.wizard.next(); 
     },
-    // step #2
+    // step #2 ---------------------------------------------------
     (ctx) => {
        axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text)
       .then((response)=> {
         // handle success
-        console.log(response.data.performance);
+        //console.log(response.data.performance);
         if (response.data.performance == undefined){
           ctx.reply('Такого кошелька нет!');
           ctx.reply('Введите кошелек заново');
@@ -61,28 +62,27 @@ const chengeSubscribe = new Scenes.WizardScene(
         ctx.reply('Выберите нужный на выпадающей клавиатуре или наберите вручную:', Markup.keyboard(wrk).oneTime().resize())
         return ctx.wizard.next();        
          
-      }).catch(function (error) {
-        // handle error
-        console.log(error);
+      }).catch(function (error) {   
+        console.log('Ошибка запроса при обновлении кошелька: ', error);
         ctx.reply('Введены неверные данные попробуйте еще раз!');
         return
       })    
     }, 
-    // step #3
+    // step #3 ------------------------------------------------------------
     (ctx) => {
-      if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text)){
+      if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text) && !ctx.wizard.state.stepError){
         ctx.reply(`Воркера «${ctx.message.text}» не существует!`);
         return 
       }
       let currWorkers = ctx.wizard.state.workers;
       let choosedWorker = ctx.message.text;
-      console.log('choosedWorker>',choosedWorker);
-      console.log('currWorkers>',currWorkers);
+      //console.log('choosedWorker>',choosedWorker);
+      //console.log('currWorkers>',currWorkers);
       let curWorkerIndex = currWorkers.findIndex(item=>item.name == choosedWorker);
-      console.log(' index>',curWorkerIndex)
+     // console.log(' index>',curWorkerIndex)
       if (curWorkerIndex!=-1){
         ctx.wizard.state.curWorkerIndex = curWorkerIndex;
-        console.log('---->',ctx.wizard.state.curWorkerIndex);
+        //console.log('---->',ctx.wizard.state.curWorkerIndex);
  
       } else {
         
@@ -94,8 +94,9 @@ const chengeSubscribe = new Scenes.WizardScene(
         }
         
         ctx.wizard.state.tempWorker = worker;
-        console.log('---->', ctx.wizard.state.workers);
+        //console.log('---->', ctx.wizard.state.workers);
       }
+      ctx.wizard.state.stepError = true;
       ctx.reply('Выберите размерность порогового уровня хешрейта:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
@@ -106,8 +107,14 @@ const chengeSubscribe = new Scenes.WizardScene(
       return ctx.wizard.next()
        
     },     
-    // step #4      
+    // step #4 -------------------------------------------------   
     (ctx) => {
+      
+      if (ctx.wizard.state.stepError) {
+        ctx.reply('Выберите кнопками выше!'); 
+        ctx.wizard.state.stepError = true;
+        return 
+      } 
       let regexp = /^[0-9]+$/;
       if(!regexp.test(ctx.message.text)){
         ctx.reply('Введите число!');
@@ -168,7 +175,7 @@ chengeSubscribe.action('chooseCoin',  (ctx)=>{
   ctx.wizard.state.wallet = null;
   ctx.wizard.state.workers = [];
   ctx.wizard.steps[1](ctx);
-  console.log('cursor: ', ctx.wizard.cursor);
+  //console.log('cursor: ', ctx.wizard.cursor);
 });
 
 chengeSubscribe.action('chooseWallet',  (ctx)=>{
@@ -176,21 +183,21 @@ chengeSubscribe.action('chooseWallet',  (ctx)=>{
   ctx.wizard.state.workers = [];
   ctx.reply('Введите кошелек:')
   ctx.wizard.selectStep(2);
-  console.log('cursor: ', ctx.wizard.cursor);
+ // console.log('cursor: ', ctx.wizard.cursor);
 });
 
 chengeSubscribe.action('chooseWorker',  (ctx)=>{
   axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.wizard.state.wallet)
   .then((response)=> {
     // handle success
-    console.log(response.data.performance);
+    //console.log(response.data.performance);
     if (response.data.performance == undefined){
       ctx.reply('Такого кошелька нет!');
       ctx.reply('Введите кошелек заново');
       return
     }
     ctx.wizard.selectStep(2);
-    console.log('cursor: ', ctx.wizard.cursor);
+    //console.log('cursor: ', ctx.wizard.cursor);
     let wrk= Object.keys(response.data.performance.workers);
     ctx.wizard.state.tempWorkerNames = wrk;
     let text='';
@@ -206,17 +213,16 @@ chengeSubscribe.action('chooseWorker',  (ctx)=>{
      
   }).catch(function (error) {
     // handle error
-    console.log(error);
+    console.log('Ошибка запроса при обновлении воркера: ', error);
     ctx.reply('Введены неверные данные попробуйте еще раз!');
     return
   }) 
 });
 
 chengeSubscribe.action('chooseHash',  (ctx)=>{
-
   ctx.wizard.steps[3](ctx);
   ctx.wizard.selectStep(4);
-  console.log('cursor: ', ctx.wizard.cursor);
+ // console.log('cursor: ', ctx.wizard.cursor);
 });
 
 chengeSubscribe.action('chooseblock',  (ctx)=>{
@@ -238,7 +244,6 @@ chengeSubscribe.action('chooseblock',  (ctx)=>{
    }) 
   } 
 });
-
 
 chengeSubscribe.action('chooseEth', (ctx)=>{
   ctx.wizard.state.poolId = 'ethpool';
@@ -292,24 +297,28 @@ chengeSubscribe.action('chooseK',  (ctx)=>{
   ctx.reply('Введите значение порогового уровня хашрейта в KH/s:');
 });
 chengeSubscribe.action('chooseM',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'MH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'MH/s';
   ctx.reply('Введите значение порогового уровня хашрейта в MH/s:');
 });
 chengeSubscribe.action('chooseG',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'GH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'GH/s';
   ctx.reply('Введите значение порогового уровня хашрейта в GH/s:');
 });
 chengeSubscribe.action('chooseT',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'TH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'TH/s';
   ctx.reply('Введите значение порогового уровня хашрейта в TH/s:');
   });
 chengeSubscribe.action('chooseP',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'PH/s';
   else  ctx.wizard.state.tempWorker.hashDev  = 'PH/s';
@@ -317,12 +326,12 @@ chengeSubscribe.action('chooseP',  (ctx)=>{
 });
 //---------------------------------------------------------------
 
-chengeSubscribe.action('subHash', async(ctx)=>{
+chengeSubscribe.action('subHash', (ctx)=>{
   if(ctx.wizard.state.tempWorker!=undefined){
     ctx.wizard.state.workers.push(ctx.wizard.state.tempWorker)
     
   }
-  let newUser = {
+  let changedUser = {
     userId: ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
     wallet : ctx.wizard.state.wallet,
@@ -330,21 +339,23 @@ chengeSubscribe.action('subHash', async(ctx)=>{
     workers : ctx.wizard.state.workers,
   };
   
-  
   let index = users.findIndex(item=>item.userId == ctx.chat.id);
-  console.log('index=>',index)
+  //console.log('index=>',index)
   if (index != -1){
     users.splice(index, index+1);
-    users.push(newUser);
-    console.log('User chenged: ', newUser);
-    console.log('All current users: ', users);
-    fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
-   await  ctx.reply('Ваши данные изменены!');
-   ctx.scene.enter("homeSceneWizard");
+    users.push(changedUser);
+   // console.log('User chenged: ', newUser);
+   // console.log('All current users: ', users);
+    try{
+      fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
+      console.log('Изменены данные пользователя: Id -', changedUser.userId);
+      ctx.reply('Ваши данные изменены!');
+    }catch(err){
+      console.log('Ошибка записи в файл изменений пользоваетеля: ', err);
+    }
+    ctx.scene.enter("homeSceneWizard");
   }
-
 });
-  
   
 chengeSubscribe.action('back', (ctx)=> {
   ctx.scene.leave();
@@ -354,7 +365,7 @@ chengeSubscribe.action('back', (ctx)=> {
 chengeSubscribe.command('/back', (ctx) => {
   ctx.scene.leave();
   ctx.scene.enter("homeSceneWizard");
-  console.log('chengeSubScene exit');
+ // console.log('chengeSubScene exit');
 })
   
 

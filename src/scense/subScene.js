@@ -9,6 +9,7 @@ const { Scenes, Markup } = require("telegraf");
 const subscribe = new Scenes.WizardScene(
     "subSceneWizard", // Имя сцены
      (ctx) => {
+      ctx.wizard.state.stepError=false; 
       ctx.reply('Выберите монету:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
@@ -23,7 +24,7 @@ const subscribe = new Scenes.WizardScene(
        axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text)
       .then((response)=> {
         // handle success
-        console.log(response.data.performance);
+        //console.log(response.data.performance);
         if (response.data.performance == undefined){
           ctx.reply('Такого кошелька нет!');
           ctx.reply('Введите кошелек заново');
@@ -46,15 +47,16 @@ const subscribe = new Scenes.WizardScene(
          
       }).catch(function (error) {
         // handle error
-        console.log(error);
+        console.log('Ошибка запроса при регистрации кошелька: ', error);
         ctx.reply('Введены неверные данные попробуйте еще раз!');
         return
-      })    
+      })   
+      
     }, 
     (ctx) => {
       //Здесь сделать проверку воркеров !!!!!!! Сделать обработчики ошибок
    
-      if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text)){
+      if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text) && !ctx.wizard.state.stepError){
         ctx.reply(`Воркера «${ctx.message.text}» не существует!`);
         return 
       }
@@ -64,6 +66,7 @@ const subscribe = new Scenes.WizardScene(
         hashDev: null,
         delivered: false
       }
+      ctx.wizard.state.stepError = true;
       ctx.reply('Выберите размерность порогового уровня хешрейта:', {
         parse_mode: 'HTML',
           ...Markup.inlineKeyboard([
@@ -75,11 +78,19 @@ const subscribe = new Scenes.WizardScene(
     },     
 
     (ctx) => {
+
+      if (ctx.wizard.state.stepError) {
+        ctx.reply('Выберите кнопками выше!'); 
+        ctx.wizard.state.stepError = true;
+        return 
+      } 
+      
       let regexp = /^[0-9]+$/;
       if(!regexp.test(ctx.message.text)){
         ctx.reply('Введите число!');
         return 
       } 
+    
       ctx.wizard.state.worker.hashLevel =  ctx.message.text;
       ctx.wizard.state.worker.delivered = false;
       ctx.reply('<b>Ваши данные:</b>\n'+ 
@@ -143,44 +154,50 @@ subscribe.action('notSubBlockErgo',  (ctx)=>{
 });
 
 subscribe.action('chooseK',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'KH/s'
   ctx.reply('Введите значение порогового уровня хашрейта в KH/s:');
 });
 subscribe.action('chooseM',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'MH/s'
   ctx.reply('Введите значение порогового уровня хашрейта в MH/s:');
 });
 subscribe.action('chooseG',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'GH/s'
   ctx.reply('Введите значение порогового уровня хашрейта в GH/s:');
 });
 subscribe.action('chooseT',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'TH/s'
   ctx.reply('Введите значение порогового уровня хашрейта в TH/s:');
 });
 subscribe.action('chooseP',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'PH/s'
   ctx.reply('Введите значение порогового уровня хашрейта в PH/s:');
 });
-
+//Добавление нового пльзователя -----------------------
 subscribe.action('subHash', (ctx)=>{
   let curUser = {
     userId: ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
     wallet : ctx.wizard.state.wallet,
     block : ctx.wizard.state.block, 
-    workers : [ctx.wizard.state.worker],
-
+    workers : [ctx.wizard.state.worker]
   };
-  
-  console.log('Added user: ', curUser);
   users.push(curUser);
-  console.log("All users id: ", users); 
-  fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
-  return ctx.scene.enter("homeSceneWizard")  
-
+  try{
+    fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
+    console.log('Добавлен новый пользователь: Id -', curUser.userId);
+    console.log('Всего пользователей: ', users.length);
+  }catch(err){
+    console.log('Ошибка записи в файл нового пользоваетеля: ', err);
+  }
+  return ctx.scene.enter("homeSceneWizard");
 });
-  
+ //------------------------------------------------------- 
   
 subscribe.action('back', (ctx)=> {
   ctx.scene.leave();
@@ -190,7 +207,7 @@ subscribe.action('back', (ctx)=> {
 subscribe.command('/back', (ctx) => {
   ctx.scene.leave();
   ctx.scene.enter("homeSceneWizard");
-  console.log('subScene exit');
+  //console.log('subScene exit');
 })
   
 

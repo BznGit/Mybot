@@ -17,24 +17,30 @@ const unSubscribe = new Scenes.WizardScene(
     }
 );
   //Регистрация подписчика
-  unSubscribe.action('chooseUnSub', async(ctx)=>{
+  unSubscribe.action('chooseUnSub', (ctx)=>{
     let  delUser = users.find(item=>item.userId == ctx.chat.id)
     let index = users.findIndex(item=>item.userId == ctx.chat.id);
-    console.log('index=>',index)
+   // console.log('index=>',index)
     if (index != -1){
       users.splice(index, index+1);
-      console.log('User deleted: ', delUser);
-      console.log('All current users: ', users);
-      fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
-      await ctx.reply('Вы отписались от всех оповещений!');
-      return ctx.scene.enter("homeSceneWizard")  
+     // console.log('User deleted: ', delUser);
+     // console.log('All current users: ', users);
+      try{
+        fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
+        console.log('Удален пользователь: Id -', delUser.userId);
+        console.log('Всего пользователей: ', users.length);
+        ctx.reply('Вы отписались от всех оповещений!');
+      }catch(err){
+        console.log('Ошибка записи в файлудаления пользоваетеля: ', err);
+      }
+    return ctx.scene.enter("homeSceneWizard")  
     }
   });
    
   unSubscribe.action('back', (ctx)=> {
     ctx.scene.leave();
     ctx.scene.enter("homeSceneWizard");
-    console.log('unSubScene exit'); 
+   //console.log('unSubScene exit'); 
   });
 
 module.exports = unSubscribe;
