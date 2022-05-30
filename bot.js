@@ -23,13 +23,21 @@ bot.start((ctx) =>{
     ctx.reply('У Вас недостаточно прав для выполнения этой команды');
     return; 
   }
+  ctx.reply('Добро пожаловать в бот поддержки пользователей ETHCORE MINING POOL\n Для начала работы с ботом нажминте продолжить', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+        Markup.button.callback('Продолжить', 'onStart'),    
+      ])
+  })
+
+})
+bot.action('onStart', (ctx)=>{
   ctx.scene.enter("homeSceneWizard")
 })
 
 // Запуск бота
 bot.launch();
 
-bot.on()
 var lastBlock = null;
 var tempBlock  =null;
 function start(){

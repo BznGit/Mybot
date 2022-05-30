@@ -42,6 +42,11 @@ const unSubscribe = new Scenes.WizardScene(
     ctx.scene.enter("homeSceneWizard");
    //console.log('unSubScene exit'); 
   });
+  unSubscribe.command('/back', (ctx) => {
+    ctx.scene.leave();
+    //ctx.scene.enter("homeSceneWizard");
+    //console.log('subScene exit');
+  })
 
 module.exports = unSubscribe;
 

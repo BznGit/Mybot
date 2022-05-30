@@ -206,7 +206,7 @@ subscribe.action('back', (ctx)=> {
 
 subscribe.command('/back', (ctx) => {
   ctx.scene.leave();
-  ctx.scene.enter("homeSceneWizard");
+  //ctx.scene.enter("homeSceneWizard");
   //console.log('subScene exit');
 })
   

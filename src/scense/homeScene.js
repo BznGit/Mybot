@@ -5,18 +5,16 @@ const {WizardScene, Scenes, Markup} = require("telegraf");
 const home = new Scenes.WizardScene(
     "homeSceneWizard", // Имя сцены
     (ctx)=>{
-      
       let currUser = users.find(item=>item.userId == ctx.chat.id);
-     // console.log('Current user: ', currUser)
       if (currUser == undefined){
         try{
-           return ctx.reply('Добро пожаловать в бот, который может Вас оповещать о появлении нового блока и падении текущего хешрейта:', {
+           return ctx.reply('Сейчас у Вас нет подписки на оповещение о появлении нового блока и падении текущего хешрейта воркеров', {
           parse_mode: 'HTML',
           ...Markup.inlineKeyboard([
               Markup.button.callback('Подписаться на оповещение', 'onSub'),    
             ])
         })
-        }catch(err){console.log('wswss>>>',err)}
+        }catch(err){console.log('Ошибка! HomeScene',err)}
         
       }
       else
@@ -57,6 +55,13 @@ home.action('unSub', (ctx)=>{
 home.action('chengeSub', (ctx)=>{
   ctx.scene.enter("chengeSubSceneWizard")  
 });
+home.command('/back', (ctx) => {
+
+  ctx.scene.leave();
+  
+  //ctx.scene.enter("homeSceneWizard");
+  //console.log('subScene exit');
+})
 
 
 module.exports = home;
