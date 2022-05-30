@@ -11,6 +11,7 @@ const chengeSubscribe = require('./src/scense/chengeSubScene');
 const users = require('./src/storage/users.json');
 const {formatHashrate} = require('./src/libs/utils.js');
 const {koeff} = require('./src/libs/utils.js');
+const fs = require('fs');
 // Создаем менеджера сцен
 const stage = new Scenes.Stage();
 stage.register( home, subscribe, unSubscribe, chengeSubscribe);
@@ -163,6 +164,7 @@ function  getHash(){
                 );
                 itemCW.delivered = true;
                 console.log('Отпрвалено сообщение о хешрейте пользователю: Id -', item.userId);
+
               }catch(err){
                 console.log('Ошибка отправки сообщения о хешрейте! ', err);
                 bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о хешрейте!  \n' + err);
@@ -179,6 +181,7 @@ function  getHash(){
           itemCW.delivered = true;
         }
       })
+      
       //-------------------------------------------
       if (response.data.performance == undefined){
         console.log('Ошибка опроса хешрейта!');
@@ -189,7 +192,14 @@ function  getHash(){
        bot.telegram.sendMessage(settings.adminId, 'API ERORR! Block request: \n' + error);
       return
      })
-  })  
+  })
+  try{
+    console.log(users[0].workers)
+    fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
+  }catch(err){
+    console.log('Ошибка записи в файл о доставленном сообщении:',err);
+  }
+  
 }
 
 

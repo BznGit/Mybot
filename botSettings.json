@@ -1,6 +1,6 @@
 {
     "telegramBotToken": "5188858155:AAGARVJ3PKMEp4rKvu6VQTR7hcV7QjkRqmE",
     "MiningCoreApiEndpoints":"http://ethcore.ru:4000",
-    "monitoringPeriodSec": "180",
+    "monitoringPeriodSec": "60",
     "adminId":"886960493"
 }
