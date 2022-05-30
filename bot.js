@@ -23,14 +23,16 @@ bot.start((ctx) =>{
     ctx.reply('У Вас недостаточно прав для выполнения этой команды');
     return; 
   }
-  ctx.reply('Добро пожаловать в бот поддержки пользователей ETHCORE MINING POOL\n Для начала работы с ботом нажминте продолжить', {
-    parse_mode: 'HTML',
-    ...Markup.inlineKeyboard([
+  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
+  '<b>ETHCORE MINING POOL</b>\n'+
+  ' Для начала работы с ботом нажмите «Продолжить»', 
+  {parse_mode: 'HTML',
+   ...Markup.inlineKeyboard([
         Markup.button.callback('Продолжить', 'onStart'),    
       ])
   })
-
 })
+
 bot.action('onStart', (ctx)=>{
   ctx.scene.enter("homeSceneWizard")
 })
@@ -72,15 +74,15 @@ function getBlock(){
             if (item.block =='да'){
               try{
                 bot.telegram.sendMessage(item.userId,
-                  "НОВЫЙ БЛОК ПОДТВЕРЖДЕН!"+"\n"+
-                  "<b>Высота блока: </b>"  + currBlock.blockHeight +"\n" +
-                  "<b>Сложность сети: </b>" + currBlock.networkDifficulty +"\n"+
-                  "<b>Тип: </b>" + currBlock.type +"\n"+
-                  "<b>Усилие: </b>" + Math.trunc(currBlock.effort*100)+"%" +"\n"+
-                  "<b>Награда: </b>" + currBlock.reward +"\n"+
-                  "<b>Ссылка: </b>" +    currBlock.infoLink +"\n"+
-                  "<b>Майнер: </b>" +    currBlock.miner +"\n"+
-                  "<b>Создан: </b>" +    currBlock.created, {parse_mode: 'HTML'}
+                  '<u>НОВЫЙ БЛОК ПОДТВЕРЖДЕН!</u>\n'+
+                  "<b>- высота блока: </b>"  + currBlock.blockHeight +";\n" +
+                  "<b>- сложность сети: </b>" + currBlock.networkDifficulty +";\n"+
+                  "<b>- тип: </b>" + currBlock.type +";\n"+
+                  "<b>- усилие: </b>" + Math.trunc(currBlock.effort*100)+"%" +";\n"+
+                  "<b>- награда: </b>" + currBlock.reward +";\n"+
+                  "<b>- ссылка: </b>" +    currBlock.infoLink +";\n"+
+                  "<b>- майнер: </b>" +    currBlock.miner +";\n"+
+                  "<b>- создан: </b>" +    currBlock.created, {parse_mode: 'HTML'}
                 ); 
                 console.log('Отпрвалено сообщение о подтверждении блока пользователю: Id -', item.userId);
               }catch(err){
@@ -104,11 +106,11 @@ function getBlock(){
             
               try{
                 bot.telegram.sendMessage(item.userId,
-                  "НАЙДЕН НОВЫЙ БЛОК!"+"\n"+
-                  "<b>Высота блока: </b>"  + currBlock.blockHeight +"\n" +
-                  "<b>Сложность сети: </b>" + currBlock.networkDifficulty +"\n"+
-                  "<b>Ссылка: </b>" +    currBlock.infoLink +"\n"+
-                  "<b>Майнер: </b>" +    currBlock.miner +"\n", {parse_mode: 'HTML'}
+                  '<u>НАЙДЕН НОВЫЙ БЛОК:</u>\n'+
+                  "<b>- высота блока: </b>"  + currBlock.blockHeight +";\n" +
+                  "<b>- сложность сети: </b>" + currBlock.networkDifficulty +";\n"+
+                  "<b>- ссылка: </b>" +    currBlock.infoLink +";\n"+
+                  "<b>- майнер: </b>" +    currBlock.miner +"\n", {parse_mode: 'HTML'}
                 );
                 console.log('Отпрвалено сообщение о новом блоке пользователю: Id -', item.userId);
               }catch(err){

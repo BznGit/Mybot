@@ -93,12 +93,12 @@ const subscribe = new Scenes.WizardScene(
   
     ctx.wizard.state.worker.hashLevel =  ctx.message.text;
     ctx.wizard.state.worker.delivered = false;
-    ctx.reply('<b>Ваши данные:</b>\n'+ 
-      'Монета: '  + ctx.wizard.state.poolId + '\n' +
-      'Оповещение о новом блоке: '  + ctx.wizard.state.block + '\n' +
-      'Кошелек: ' + ctx.wizard.state.wallet + '\n' +
-      'Воркер: '  + ctx.wizard.state.worker.name + '\n' +
-      'Оповещение об уровене хешрейта: '  + ctx.wizard.state.worker.hashLevel + ' ' + ctx.wizard.state.worker.hashDev,
+    ctx.reply('<u>Ваши данные:</u>\n'+ 
+      '<b>- монета: </b>'  + ctx.wizard.state.poolId + ';\n' +
+      '<b>- оповещение о новом блоке: </b>«'  + ctx.wizard.state.block + '»;\n' +
+      '<b>- кошелек: </b>' + ctx.wizard.state.wallet + ';\n' +
+      '<b>- воркер: «</b>'  + ctx.wizard.state.worker.name + '»;\n' +
+      '<b>- оповещение об уровене хешрейта: </b>'  + ctx.wizard.state.worker.hashLevel + ' ' + ctx.wizard.state.worker.hashDev,
       {parse_mode: 'HTML'}
     ).then(
       ctx.reply('Подписаться?', {
@@ -108,7 +108,7 @@ const subscribe = new Scenes.WizardScene(
           { text: "Нет", callback_data: 'back' }
         ])
       })
-    )      
+    )     
   } 
 );
 subscribe.action('chooseEth', (ctx)=>{
@@ -180,6 +180,7 @@ subscribe.action('chooseP',  (ctx)=>{
 });
 //Добавление нового пльзователя -----------------------
 subscribe.action('subHash', (ctx)=>{
+  ctx.reply('Вы подписаны наоповещение от бота!')
   let curUser = {
     userId: ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
@@ -195,19 +196,40 @@ subscribe.action('subHash', (ctx)=>{
   }catch(err){
     console.log('Ошибка записи в файл нового пользоваетеля: ', err);
   }
-  return ctx.scene.enter("homeSceneWizard");
+   ctx.scene.leave();
+   ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
+   '<b>ETHCORE MINING POOL</b>\n'+
+   ' Для начала работы с ботом нажмите «Продолжить»', 
+   {parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+         Markup.button.callback('Продолжить', 'onStart'),    
+       ])
+   })
 });
  //------------------------------------------------------- 
   
 subscribe.action('back', (ctx)=> {
   ctx.scene.leave();
-  ctx.scene.enter("homeSceneWizard")  
+  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
+  '<b>ETHCORE MINING POOL</b>\n'+
+  ' Для начала работы с ботом нажмите «Продолжить»', 
+  {parse_mode: 'HTML',
+   ...Markup.inlineKeyboard([
+        Markup.button.callback('Продолжить', 'onStart'),    
+      ])
+  })
 });
 
 subscribe.command('/back', (ctx) => {
   ctx.scene.leave();
-  //ctx.scene.enter("homeSceneWizard");
-  //console.log('subScene exit');
+  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
+  '<b>ETHCORE MINING POOL</b>\n'+
+  ' Для начала работы с ботом нажмите «Продолжить»', 
+  {parse_mode: 'HTML',
+   ...Markup.inlineKeyboard([
+        Markup.button.callback('Продолжить', 'onStart'),    
+      ])
+  })
 })
   
 

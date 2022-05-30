@@ -29,23 +29,46 @@ const unSubscribe = new Scenes.WizardScene(
         fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
         console.log('Удален пользователь: Id -', delUser.userId);
         console.log('Всего пользователей: ', users.length);
-        ctx.reply('Вы отписались от всех оповещений!');
+        ctx.reply('Вы отписались от всех оповещений!')
+        ctx.scene.leave();
+        ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
+        '<b>ETHCORE MINING POOL</b>\n'+
+        ' Для начала работы с ботом нажмите «Продолжить»', 
+        {parse_mode: 'HTML',
+         ...Markup.inlineKeyboard([
+              Markup.button.callback('Продолжить', 'onStart'),    
+            ])
+        })
       }catch(err){
         console.log('Ошибка записи в файлудаления пользоваетеля: ', err);
       }
-    return ctx.scene.enter("homeSceneWizard")  
+      ctx.scene.leave();
+      ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
+      '<b>ETHCORE MINING POOL</b>\n'+
+      ' Для начала работы с ботом нажмите «Продолжить»', 
+      {parse_mode: 'HTML',
+       ...Markup.inlineKeyboard([
+            Markup.button.callback('Продолжить', 'onStart'),    
+          ])
+      })
     }
   });
    
   unSubscribe.action('back', (ctx)=> {
     ctx.scene.leave();
     ctx.scene.enter("homeSceneWizard");
-   //console.log('unSubScene exit'); 
   });
+
   unSubscribe.command('/back', (ctx) => {
     ctx.scene.leave();
-    //ctx.scene.enter("homeSceneWizard");
-    //console.log('subScene exit');
+    ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
+    '<b>ETHCORE MINING POOL</b>\n'+
+    ' Для начала работы с ботом нажмите «Продолжить»', 
+    {parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+          Markup.button.callback('Продолжить', 'onStart'),    
+        ])
+    })
   })
 
 module.exports = unSubscribe;

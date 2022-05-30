@@ -151,12 +151,12 @@ const chengeSubscribe = new Scenes.WizardScene(
         //Проверка на несуществующий воркер ----------------------------
         ctx.wizard.state.tempWorker.hashLevel =  ctx.message.text;
         ctx.wizard.state.tempWorker.delivered = false;
-        ctx.reply('<b>Ваши новые данные:</b>\n'+ 
-          'Монета: '  + '<i>' + ctx.wizard.state.poolId + '</i>'+ '\n' +
-          'Оповещение о новом блоке: ' + '<i>'  +ctx.wizard.state.block + '</i>' + '\n' +
-          'Кошелек: ' + '<i>' + ctx.wizard.state.wallet + '</i>' + '\n' +
-          'Воркер: '  + '<i>' + ctx.wizard.state.tempWorker.name + '</i>' + '\n' +
-          'Оповещение об уровене хешрейта: '  + '<i>'  + ctx.wizard.state.tempWorker.hashLevel + ' ' + ctx.wizard.state.tempWorker.hashDev + '</i>',
+        ctx.reply('<u>Ваши новые данные:</u>\n'+ 
+          '<b>- монета: </b>' + ctx.wizard.state.poolId + ';\n' +
+          '<b>- оповещение о новом блоке: </b>«'  +ctx.wizard.state.block  + '»;\n' +
+          '<b>- кошелек: </b>' + ctx.wizard.state.wallet  + ';\n' +
+          '<b>- воркер: </b>«' + ctx.wizard.state.tempWorker.name  + '»;\n' +
+          '<b>- оповещение об уровене хешрейта: </b>'  + ctx.wizard.state.tempWorker.hashLevel + ' ' + ctx.wizard.state.tempWorker.hashDev,
           {parse_mode: 'HTML'}
         ).then(
           ctx.reply('Подписаться?', {
@@ -347,13 +347,23 @@ chengeSubscribe.action('subHash', (ctx)=>{
    // console.log('User chenged: ', newUser);
    // console.log('All current users: ', users);
     try{
+     
       fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
       console.log('Изменены данные пользователя: Id -', changedUser.userId);
-      ctx.reply('Ваши данные изменены!');
+      
     }catch(err){
       console.log('Ошибка записи в файл изменений пользоваетеля: ', err);
     }
-    ctx.scene.enter("homeSceneWizard");
+    ctx.scene.leave();
+    ctx.reply('Ваши данные изменены!');
+    ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
+    '<b>ETHCORE MINING POOL</b>\n'+
+    ' Для начала работы с ботом нажмите «Продолжить»', 
+    {parse_mode: 'HTML',
+     ...Markup.inlineKeyboard([
+          Markup.button.callback('Продолжить', 'onStart'),    
+        ])
+    })
   }
 });
   
@@ -364,8 +374,14 @@ chengeSubscribe.action('back', (ctx)=> {
 
 chengeSubscribe.command('/back', (ctx) => {
   ctx.scene.leave();
-  ctx.scene.enter("homeSceneWizard");
- // console.log('chengeSubScene exit');
+  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
+  '<b>ETHCORE MINING POOL</b>\n'+
+  ' Для начала работы с ботом нажмите «Продолжить»', 
+  {parse_mode: 'HTML',
+   ...Markup.inlineKeyboard([
+        Markup.button.callback('Продолжить', 'onStart'),    
+      ])
+  })
 })
   
 
