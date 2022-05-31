@@ -18,14 +18,12 @@ let logIt = function(log, ...obj){
   let min = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
   let time  = `${hour}:${min}`;
   let data = `${day}.${month}.${year} \n`
-
-  let regexp = /[data]/;
-  if(!regexp.test(oldLogs)){
+  console.log(data);
+  
+  if(oldLogs.indexOf(data)==-1){
     try{
       fs.appendFileSync('./src/storage/logs.txt', data);
-    }catch(err){
-      console.log('Ошибка записи файла логов: ./src/storage/logs.txt ', err)
-    }
+    }catch(err){console.log('Ошибка записи файла логов: ./src/storage/logs.txt ', err)}
   } 
   try{
     fs.appendFileSync('./src/storage/logs.txt', '     ' +  time +' | ' + log + obj.toString() +'\n'); 
