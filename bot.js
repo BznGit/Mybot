@@ -75,7 +75,8 @@ function getBlock(){
             if (item.block =='да'){
               try{
                 bot.telegram.sendMessage(item.userId,
-                  '<u>НОВЫЙ БЛОК ПОДТВЕРЖДЕН!</u>\n'+
+                  '<b>Новый блок подтвержден!</b>\n'+
+                  'Параметры блока:\n' +
                   "<b>- высота блока: </b>"  + currBlock.blockHeight +";\n" +
                   "<b>- сложность сети: </b>" + currBlock.networkDifficulty +";\n"+
                   "<b>- тип: </b>" + currBlock.type +";\n"+
@@ -109,7 +110,8 @@ function getBlock(){
             
               try{
                 bot.telegram.sendMessage(item.userId,
-                  '<u>НАЙДЕН НОВЫЙ БЛОК:</u>\n'+
+                  '<b>Найден новый блок!</b>\n'+
+                  'Параметры блока:\n' +
                   "<b>- высота блока: </b>"  + currBlock.blockHeight +";\n" +
                   "<b>- сложность сети: </b>" + currBlock.networkDifficulty +";\n"+
                   "<b>- ссылка: </b>" +    currBlock.infoLink +";\n"+
@@ -158,12 +160,11 @@ function  getHash(){
               try{
                 bot.telegram.sendMessage(item.userId,
                   '<b>Предупреждение!</b>\n' +
-                  'Хешрейт  кошелька\n' +
-                  '<i>' + item.wallet  + '</i>' + ' \n' +
-                  'с воркером '   + '<i>«' +  `${itemCW.name ==''? 'default': itemCW.name}` + '</i>»' + '\n' +
-                  'опустился ниже установленного в ' + '<i>' +  itemCW.hashLevel + '</i>'  +' ' + '<i>' +  itemCW.hashDev + '</i>\n' +
-                  'и составляет ' + '<i>' +  formatHashrate(itemAWhash)+ '</i>\n\n' +
-                  '<b>ВНИМАНИЕ! Оповещение об уровне хешрейта отключено.</b>\n' +
+                  'Хешрейт  кошелька\n<b>' + item.wallet   + '</b> \n' +
+                  'с воркером '   + '«<b>' +  `${itemCW.name ==''? 'default': itemCW.name}` + '</b>»' + '\n' +
+                  'опустился ниже установленного в <b>'  +  itemCW.hashLevel   +' '  +  itemCW.hashDev + '</b>\n' +
+                  'и составляет <b>'  +  formatHashrate(itemAWhash)+ '</b>\n\n' +
+                  '<b>Внимание! Оповещение об уровне хешрейта отключено.</b>\n' +
                   'Для возобновления оповещения устовновите новый уровень хешрейта для этого воркера', 
                   {parse_mode: 'HTML'}
                 );

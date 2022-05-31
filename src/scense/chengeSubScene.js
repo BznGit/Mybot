@@ -131,11 +131,11 @@ const chengeSubscribe = new Scenes.WizardScene(
         for(let i=0; i<item.length; i++){
           text += `${i+1}) «`+ item[i].name +'» : ограничение - ' + item[i].hashLevel +' '+ item[i].hashDev + `, оповещение: «${item[i].delivered? 'отключено':'включено'}` + '»;\n'
         }
-        ctx.reply('<b>Ваши новые данные:</b>\n' +
-          'Монета: '  + '<i>' + ctx.wizard.state.poolId + '</i>' + '\n' +
-          'Оповещение о новом блоке: ' + '<i>' + ctx.wizard.state.block + '</i>\n' +
-          'Кошелек: ' + '<i>' + ctx.wizard.state.wallet + '</i>' + ',\n' +
-          'Воркеры: \n'  + text + 
+        ctx.reply('<u>Ваши новые данные:</u>\n' +
+          '<b>- монета: </b>'   + ctx.wizard.state.poolId +  ';\n' +
+          '<b>- оповещение о новом блоке:</b> «'  + ctx.wizard.state.block + '»;\n' +
+          '<b>- кошелек: </b>'  + ctx.wizard.state.wallet + ';\n' +
+          '<b>- воркеры:</b> \n'  + text + 
                   
           '<b>Выберите:</b>',  {
             parse_mode: 'HTML',
