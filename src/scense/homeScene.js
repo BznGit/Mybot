@@ -1,6 +1,8 @@
 const fs = require('fs');
 const users = require('../storage/users.json');
+const settings = require('../../botSettings.json');
 const {WizardScene, Scenes, Markup} = require("telegraf");
+const {logIt} = require('../libs/loger');
 // Сцена создания нового матча.
 const home = new Scenes.WizardScene(
   "homeSceneWizard", // Имя сцены
@@ -14,7 +16,10 @@ const home = new Scenes.WizardScene(
             Markup.button.callback('Подписаться на оповещение', 'onSub'),    
           ])
       })
-      }catch(err){console.log('Ошибка! HomeScene',err)}
+      }catch(err){
+        console.log('Ошибка! HomeScene', err);
+        logIt('Ошибка  homeScene.js 20 стр', err);
+      }
       
     }
     else
@@ -40,7 +45,8 @@ const home = new Scenes.WizardScene(
           });
                     
       }catch(err){
-        console.log('Ошибка пользователя: ', err)
+        console.log('Ошибка пользователя: ', err);
+        logIt('Ошибка пользователя: homeScene.js 45 стр', err);
       }
     } 
 });
@@ -57,24 +63,18 @@ home.action('chengeSub', (ctx)=>{
 });
 home.action('back', (ctx)=>{
   ctx.scene.leave();
-  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
-  '<b>ETHCORE MINING POOL</b>\n'+
-  ' Для начала работы с ботом нажмите «Продолжить»', 
-  {parse_mode: 'HTML',
-   ...Markup.inlineKeyboard([
-        Markup.button.callback('Продолжить', 'onStart'),    
+  ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+     { text: "Продолжить", callback_data: 'onStart' },    
       ])
-  })  
+  }) 
 });
 home.command('/back', (ctx) => {
 
   ctx.scene.leave();
-  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
-  '<b>ETHCORE MINING POOL</b>\n'+
-  ' Для начала работы с ботом нажмите «Продолжить»', 
-  {parse_mode: 'HTML',
-   ...Markup.inlineKeyboard([
-        Markup.button.callback('Продолжить', 'onStart'),    
+  ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+     { text: "Продолжить", callback_data: 'onStart' },    
       ])
   })
 })

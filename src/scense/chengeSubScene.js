@@ -4,7 +4,7 @@ const settings = require('../../botSettings.json');
 const api = settings.MiningCoreApiEndpoints;
 const users = require('../storage/users.json');
 const { Scenes, Markup } = require("telegraf");
-
+const {logIt} = require('../libs/loger');
 // Сцена создания нового матча.
 const chengeSubscribe = new Scenes.WizardScene(
     "chengeSubSceneWizard", // Имя сцены
@@ -64,6 +64,7 @@ const chengeSubscribe = new Scenes.WizardScene(
          
       }).catch(function (error) {   
         console.log('Ошибка запроса при обновлении кошелька: ', error);
+        logIt('Ошибка запроса при обновлении кошелька: ', error);
         ctx.reply('Введены неверные данные попробуйте еще раз!');
         return
       })    
@@ -214,6 +215,7 @@ chengeSubscribe.action('chooseWorker',  (ctx)=>{
   }).catch(function (error) {
     // handle error
     console.log('Ошибка запроса при обновлении воркера: ', error);
+    logIt('Ошибка запроса при обновлении воркера: ', error);
     ctx.reply('Введены неверные данные попробуйте еще раз!');
     return
   }) 
@@ -332,10 +334,10 @@ chengeSubscribe.action('subHash', (ctx)=>{
     
   }
   let changedUser = {
-    userId: ctx.chat.id,
-    poolId : ctx.wizard.state.poolId,
-    wallet : ctx.wizard.state.wallet,
-    block : ctx.wizard.state.block, 
+    userId  : ctx.chat.id,
+    poolId  : ctx.wizard.state.poolId,
+    wallet  : ctx.wizard.state.wallet,
+    block   : ctx.wizard.state.block, 
     workers : ctx.wizard.state.workers,
   };
   
@@ -350,20 +352,20 @@ chengeSubscribe.action('subHash', (ctx)=>{
      
       fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
       console.log('Изменены данные пользователя: Id -', changedUser.userId);
+      logIt('Изменены данные пользователя: Id -', changedUser.userId);
       
     }catch(err){
       console.log('Ошибка записи в файл изменений пользоваетеля: ', err);
+      logIt('Ошибка записи в файл изменений пользоваетеля: ', err);
     }
-    ctx.scene.leave();
+   
     ctx.reply('Ваши данные изменены!');
-    ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
-    '<b>ETHCORE MINING POOL</b>\n'+
-    ' Для начала работы с ботом нажмите «Продолжить»', 
-    {parse_mode: 'HTML',
-     ...Markup.inlineKeyboard([
-          Markup.button.callback('Продолжить', 'onStart'),    
-        ])
-    })
+    ctx.scene.leave();
+    ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+     { text: "Продолжить", callback_data: 'onStart' },    
+      ])
+  })
   }
 });
   
@@ -374,12 +376,9 @@ chengeSubscribe.action('back', (ctx)=> {
 
 chengeSubscribe.command('/back', (ctx) => {
   ctx.scene.leave();
-  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
-  '<b>ETHCORE MINING POOL</b>\n'+
-  ' Для начала работы с ботом нажмите «Продолжить»', 
-  {parse_mode: 'HTML',
-   ...Markup.inlineKeyboard([
-        Markup.button.callback('Продолжить', 'onStart'),    
+  ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+     { text: "Продолжить", callback_data: 'onStart' },    
       ])
   })
 })

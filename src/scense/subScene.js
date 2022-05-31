@@ -4,6 +4,7 @@ const settings = require('../../botSettings.json');
 const api = settings.MiningCoreApiEndpoints;
 const users = require('../storage/users.json');
 const { Scenes, Markup } = require("telegraf");
+const {logIt} = require('../libs/loger');
 
 // Сцена создания нового матча.
 const subscribe = new Scenes.WizardScene(
@@ -48,6 +49,7 @@ const subscribe = new Scenes.WizardScene(
     }).catch(function (error) {
       // handle error
       console.log('Ошибка запроса при регистрации кошелька: ', error);
+      logIt('Ошибка запроса при регистрации кошелька: ', error);
       ctx.reply('Введены неверные данные попробуйте еще раз!');
       return
     })   
@@ -192,42 +194,36 @@ subscribe.action('subHash', (ctx)=>{
   try{
     fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
     console.log('Добавлен новый пользователь: Id -', curUser.userId);
+    logIt('Добавлен новый пользователь: Id -', curUser.userId);
     console.log('Всего пользователей: ', users.length);
+    logIt('Всего пользователей: ', users.length);
   }catch(err){
     console.log('Ошибка записи в файл нового пользоваетеля: ', err);
+    logIt('Ошибка записи в файл нового пользоваетеля: ', err);
   }
    ctx.scene.leave();
-   ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
-   '<b>ETHCORE MINING POOL</b>\n'+
-   ' Для начала работы с ботом нажмите «Продолжить»', 
-   {parse_mode: 'HTML',
-    ...Markup.inlineKeyboard([
-         Markup.button.callback('Продолжить', 'onStart'),    
-       ])
-   })
+   ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
+   ...Markup.inlineKeyboard([
+    { text: "Продолжить", callback_data: 'onStart' },    
+     ])
+ })
 });
  //------------------------------------------------------- 
   
 subscribe.action('back', (ctx)=> {
   ctx.scene.leave();
-  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
-  '<b>ETHCORE MINING POOL</b>\n'+
-  ' Для начала работы с ботом нажмите «Продолжить»', 
-  {parse_mode: 'HTML',
-   ...Markup.inlineKeyboard([
-        Markup.button.callback('Продолжить', 'onStart'),    
+  ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+     { text: "Продолжить", callback_data: 'onStart' },    
       ])
   })
 });
 
 subscribe.command('/back', (ctx) => {
   ctx.scene.leave();
-  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
-  '<b>ETHCORE MINING POOL</b>\n'+
-  ' Для начала работы с ботом нажмите «Продолжить»', 
-  {parse_mode: 'HTML',
-   ...Markup.inlineKeyboard([
-        Markup.button.callback('Продолжить', 'onStart'),    
+  ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+     { text: "Продолжить", callback_data: 'onStart' },    
       ])
   })
 })

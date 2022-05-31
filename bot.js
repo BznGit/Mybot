@@ -11,7 +11,9 @@ const chengeSubscribe = require('./src/scense/chengeSubScene');
 const users = require('./src/storage/users.json');
 const {formatHashrate} = require('./src/libs/utils.js');
 const {koeff} = require('./src/libs/utils.js');
+const {logIt} = require('./src/libs/loger.js');
 const fs = require('fs');
+
 // Создаем менеджера сцен
 const stage = new Scenes.Stage();
 stage.register( home, subscribe, unSubscribe, chengeSubscribe);
@@ -24,12 +26,9 @@ bot.start((ctx) =>{
     ctx.reply('У Вас недостаточно прав для выполнения этой команды');
     return; 
   }
-  ctx.reply('Добро пожаловать в чат-бот поддержки пользователей\n'+
-  '<b>ETHCORE MINING POOL</b>\n'+
-  ' Для начала работы с ботом нажмите «Продолжить»', 
-  {parse_mode: 'HTML',
-   ...Markup.inlineKeyboard([
-        Markup.button.callback('Продолжить', 'onStart'),    
+  ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+     { text: "Продолжить", callback_data: 'onStart' },    
       ])
   })
 })
@@ -47,6 +46,7 @@ function start(){
   setInterval(getBlock, settings.monitoringPeriodSec*1000);
   setInterval(getHash, settings.monitoringPeriodSec*1000)
   console.log('Bot started');
+  logIt('Bot started');
 };
 
 //Получение номера последнего блока
@@ -86,8 +86,10 @@ function getBlock(){
                   "<b>- создан: </b>" +    currBlock.created, {parse_mode: 'HTML'}
                 ); 
                 console.log('Отпрвалено сообщение о подтверждении блока пользователю: Id -', item.userId);
+                logIt('Отпрвалено сообщение о подтверждении блока пользователю: Id -', item.userId)
               }catch(err){
                 console.log('Ошибка отправки сообщения о подтвержденном блоке! ', err);
+                logIt('Ошибка отправки сообщения о подтвержденном блоке! ', err);
                 bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о подтвержденном блоке \n' + err);
               }
             }
@@ -114,8 +116,10 @@ function getBlock(){
                   "<b>- майнер: </b>" +    currBlock.miner +"\n", {parse_mode: 'HTML'}
                 );
                 console.log('Отпрвалено сообщение о новом блоке пользователю: Id -', item.userId);
+                logIt('Отпрвалено сообщение о новом блоке пользователю: Id -', item.userId);
               }catch(err){
                 console.log('Ошибка отправки сообщения о новом блоке! ', err);
+                logIt('Ошибка отправки сообщения о новом блоке! ', err());
                 bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о новом блоке! \n' + err);
               }
             }
@@ -130,6 +134,7 @@ function getBlock(){
   })
   .catch(error => {
     console.error('API ERORR! Block request: ', error);
+    logIt('API ERORR! Block request: ', error);
     bot.telegram.sendMessage(settings.adminId, 'API ERORR! Block request: \n' + error);
   })
 };
@@ -164,9 +169,10 @@ function  getHash(){
                 );
                 itemCW.delivered = true;
                 console.log('Отпрвалено сообщение о хешрейте пользователю: Id -', item.userId);
-
+                logIt('Отпрвалено сообщение о хешрейте пользователю: Id -', item.userId);
               }catch(err){
                 console.log('Ошибка отправки сообщения о хешрейте! ', err);
+                logIt('Ошибка отправки сообщения о хешрейте! ', err);
                 bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о хешрейте!  \n' + err);
               }
               
@@ -185,21 +191,22 @@ function  getHash(){
       //-------------------------------------------
       if (response.data.performance == undefined){
         console.log('Ошибка опроса хешрейта!');
+        logIt('Ошибка опроса хешрейта! bot.js 194 стр');
         return
       }
     }).catch(function (error){
        console.log('API ERORR! Hashrate request: ', error);
+       logIt('API ERORR! Hashrate request: ', error);
        bot.telegram.sendMessage(settings.adminId, 'API ERORR! Block request: \n' + error);
       return
      })
   })
   try{
-    console.log(users[0].workers)
-    fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
+     fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
   }catch(err){
     console.log('Ошибка записи в файл о доставленном сообщении:',err);
+    logIt('Ошибка записи в файл о доставленном сообщении:',err);
   }
-  
 }
 
 
