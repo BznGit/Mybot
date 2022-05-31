@@ -3,8 +3,13 @@ const settings = require('../../botSettings.json');
 let logIt = function(log, ...obj){
 
   if(!settings.eventsLoger) return;
- 
-  let oldLogs = fs.readFileSync('./src/storage/logs.txt', "utf8");
+  let oldLogs=null
+  try{
+    oldLogs = fs.readFileSync('./src/storage/logs.txt', "utf8");
+  }catch(err){
+    console.log('Ошибка чтения файла логов: ./src/storage/logs.txt ', err)
+  }
+  
   let date = new Date()
   let year  = date.getFullYear();
   let month = (date.getMonth()+1) < 10 ? '0' + (date.getMonth()+1) : (date.getMonth()+1);
@@ -16,9 +21,18 @@ let logIt = function(log, ...obj){
 
   let regexp = /[data]/;
   if(!regexp.test(oldLogs)){
-    fs.appendFileSync('./src/storage/logs.txt', data);
+    try{
+      fs.appendFileSync('./src/storage/logs.txt', data);
+    }catch(err){
+      console.log('Ошибка записи файла логов: ./src/storage/logs.txt ', err)
+    }
   } 
-  fs.appendFileSync('./src/storage/logs.txt', '     ' +  time +' | ' + log + obj.toString() +'\n'); 
+  try{
+    fs.appendFileSync('./src/storage/logs.txt', '     ' +  time +' | ' + log + obj.toString() +'\n'); 
+  }catch(err){
+    console.log('Ошибка записи файла логов: ./src/storage/logs.txt ', err)
+  }
+  
    
 };
 
