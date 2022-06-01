@@ -63,8 +63,8 @@ const chengeSubscribe = new Scenes.WizardScene(
         return ctx.wizard.next();        
          
       }).catch(function (error) {   
-        console.log('Ошибка запроса при обновлении кошелька: ', error);
-        logIt('Ошибка запроса при обновлении кошелька: ', error);
+        console.log('Request error while updating wallet: ', error);
+        logIt('Request error while updating wallet: ', error);
         ctx.reply('Введены неверные данные попробуйте еще раз!');
         return
       })    
@@ -214,8 +214,8 @@ chengeSubscribe.action('chooseWorker',  (ctx)=>{
      
   }).catch(function (error) {
     // handle error
-    console.log('Ошибка запроса при обновлении воркера: ', error);
-    logIt('Ошибка запроса при обновлении воркера: ', error);
+    console.log('request error when updating worker: ', error);
+    logIt('request error when updating worker: ', error);
     ctx.reply('Введены неверные данные попробуйте еще раз!');
     return
   }) 
@@ -351,12 +351,12 @@ chengeSubscribe.action('subHash', (ctx)=>{
     try{
      
       fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
-      console.log('Изменены данные пользователя: Id -', changedUser.userId);
-      logIt('Изменены данные пользователя: Id -', changedUser.userId);
+      console.log('User data changed: Id -> ', changedUser.userId);
+      logIt('User data changed: Id -> ', changedUser.userId);
       
     }catch(err){
-      console.log('Ошибка записи в файл изменений пользоваетеля: ', err);
-      logIt('Ошибка записи в файл изменений пользоваетеля: ', err);
+      console.log('Error writing to user changes file: ', err);
+      logIt('Error writing to user changes file: ', err);
     }
    
     ctx.reply('Ваши данные изменены!');

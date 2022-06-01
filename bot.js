@@ -86,12 +86,12 @@ function getBlock(){
                   "<b>- майнер: </b>" +    currBlock.miner +";\n"+
                   "<b>- создан: </b>" +    currBlock.created, {parse_mode: 'HTML'}
                 ); 
-                console.log('Отпрвалено сообщение о подтверждении блока пользователю: Id -', item.userId);
-                logIt('Отпрвалено сообщение о подтверждении блока пользователю: Id -', item.userId)
+                console.log('Block confirmation message sent to user: Id -> ', item.userId);
+                logIt('Block confirmation message sent to user: Id ->', item.userId)
               }catch(err){
-                console.log('Ошибка отправки сообщения о подтвержденном блоке! ', err);
-                logIt('Ошибка отправки сообщения о подтвержденном блоке! ', err);
-                bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о подтвержденном блоке \n' + err);
+                console.log('Error sending message about confirmed block! ', err);
+                logIt('Error sending message about confirmed block! ', err);
+                bot.telegram.sendMessage(settings.adminId, 'Error sending message about confirmed block! \n' + err);
               }
             }
           });
@@ -117,12 +117,12 @@ function getBlock(){
                   "<b>- ссылка: </b>" +    currBlock.infoLink +";\n"+
                   "<b>- майнер: </b>" +    currBlock.miner +"\n", {parse_mode: 'HTML'}
                 );
-                console.log('Отпрвалено сообщение о новом блоке пользователю: Id -', item.userId);
-                logIt('Отпрвалено сообщение о новом блоке пользователю: Id -', item.userId);
+                console.log('Sent message about new block to user: Id -> ', item.userId);
+                logIt('Sent message about new block to user: Id -> ', item.userId);
               }catch(err){
-                console.log('Ошибка отправки сообщения о новом блоке! ', err);
-                logIt('Ошибка отправки сообщения о новом блоке! ', err());
-                bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о новом блоке! \n' + err);
+                console.log('Error sending message about new block! ', err);
+                logIt('Error sending message about new block! ', err());
+                bot.telegram.sendMessage(settings.adminId, 'Error sending message about new block! \n' + err);
               }
             }
             tempBlock = {
@@ -169,12 +169,12 @@ function  getHash(){
                   {parse_mode: 'HTML'}
                 );
                 itemCW.delivered = true;
-                console.log('Отпрвалено сообщение о хешрейте пользователю: Id -', item.userId);
-                logIt('Отпрвалено сообщение о хешрейте пользователю: Id -', item.userId);
+                console.log('A hashrate message has been sent to the user: Id -> ', item.userId);
+                logIt('A hashrate message has been sent to the user: Id -> ', item.userId);
               }catch(err){
-                console.log('Ошибка отправки сообщения о хешрейте! ', err);
-                logIt('Ошибка отправки сообщения о хешрейте! ', err);
-                bot.telegram.sendMessage(settings.adminId, 'Ошибка отправки сообщения о хешрейте!  \n' + err);
+                console.log('Error sending message about hashrate! ', err);
+                logIt('Error sending message about hashrate! ', err);
+                bot.telegram.sendMessage(settings.adminId, 'Error sending message about hashrate!  \n' + err);
               }
               
             }
@@ -191,8 +191,8 @@ function  getHash(){
       
       //-------------------------------------------
       if (response.data.performance == undefined){
-        console.log('Ошибка опроса хешрейта!');
-        logIt('Ошибка опроса хешрейта! bot.js 194 стр');
+        console.log('Hash polling error!');
+        logIt('Hash polling error! bot.js 194 стр');
         return
       }
     }).catch(function (error){
@@ -205,8 +205,8 @@ function  getHash(){
   try{
      fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
   }catch(err){
-    console.log('Ошибка записи в файл о доставленном сообщении:',err);
-    logIt('Ошибка записи в файл о доставленном сообщении:',err);
+    console.log('Error writing to the information file of the delivered message: ',err);
+    logIt('Error writing to the information file of the delivered message: ',err);
   }
 }
 

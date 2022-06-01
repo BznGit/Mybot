@@ -17,8 +17,8 @@ const home = new Scenes.WizardScene(
           ])
       })
       }catch(err){
-        console.log('Ошибка! HomeScene', err);
-        logIt('Ошибка  homeScene.js 20 стр', err);
+        console.log('Error sending message to user! HomeScene.js line 20', err);
+        logIt('Error sending message to user! HomeScene.js line 20', err);
       }
       
     }
@@ -45,8 +45,8 @@ const home = new Scenes.WizardScene(
           });
                     
       }catch(err){
-        console.log('Ошибка пользователя: ', err);
-        logIt('Ошибка пользователя: homeScene.js 45 стр', err);
+        console.log('Error getting user info: homeScene.js line 45 ', err);
+        logIt('Error getting user info: homeScene.js line 45', err);
       }
     } 
 });

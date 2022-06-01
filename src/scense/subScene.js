@@ -48,8 +48,8 @@ const subscribe = new Scenes.WizardScene(
         
     }).catch(function (error) {
       // handle error
-      console.log('Ошибка запроса при регистрации кошелька: ', error);
-      logIt('Ошибка запроса при регистрации кошелька: ', error);
+      console.log('Wallet registration request error: ', error);
+      logIt('Wallet registration request error: ', error);
       ctx.reply('Введены неверные данные попробуйте еще раз!');
       return
     })   
@@ -193,13 +193,13 @@ subscribe.action('subHash', (ctx)=>{
   users.push(curUser);
   try{
     fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
-    console.log('Добавлен новый пользователь: Id -', curUser.userId);
-    logIt('Добавлен новый пользователь: Id -', curUser.userId);
-    console.log('Всего пользователей: ', users.length);
-    logIt('Всего пользователей: ', users.length);
+    console.log('New user added: Id -> ', curUser.userId);
+    logIt('New user added: Id -> ', curUser.userId);
+    console.log('Total Users: ', users.length);
+    logIt('Total Users: ', users.length);
   }catch(err){
-    console.log('Ошибка записи в файл нового пользоваетеля: ', err);
-    logIt('Ошибка записи в файл нового пользоваетеля: ', err);
+    console.log('Error writing to new user file: ', err);
+    logIt('Error writing to new user file: ', err);
   }
    ctx.scene.leave();
    ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',

@@ -27,7 +27,7 @@ let logIt = function(log, ...obj){
   try{
     fs.appendFileSync('./src/storage/logs.txt', '     ' +  time +' > ' + log + obj.toString() +'\n'); 
   }catch(err){
-    console.log('Ошибка записи файла логов: ./src/storage/logs.txt ', err)
+    console.log('Error writing log file: ./src/storage/logs.txt ', err)
   }
   
    

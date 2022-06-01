@@ -28,10 +28,10 @@ const unSubscribe = new Scenes.WizardScene(
      // console.log('All current users: ', users);
       try{
         fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
-        console.log('Удален пользователь: Id -', delUser.userId);
-        logIt('Удален пользователь: Id -', delUser.userId);
-        console.log('Всего пользователей: ', users.length);
-        logIt('Всего пользователей: ', users.length);
+        console.log('Removed user: Id -> ', delUser.userId);
+        logIt('Removed user: Id -> ', delUser.userId);
+        console.log('Total Users: ', users.length);
+        logIt('Total Users: ', users.length);
         ctx.reply('Вы отписались от всех оповещений!')
         ctx.scene.leave();
         ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
@@ -40,8 +40,8 @@ const unSubscribe = new Scenes.WizardScene(
           ])
       })
       }catch(err){
-        console.log('Ошибка записи в файл удаления пользоваетеля: ', err);
-        logIt('Ошибка записи в файл удаления пользоваетеля: ', err);
+        console.log('rror writing user deletion information to file: ', err);
+        logIt('rror writing user deletion information to file: ', err);
       }
       ctx.scene.leave();
       ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
