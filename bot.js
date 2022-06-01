@@ -171,11 +171,11 @@ function  getHash(){
               try{
                 bot.telegram.sendMessage(item.userId,
                   '<b>Предупреждение!</b>\n' +
-                  'Хешрейт  кошелька\n<b>' + item.wallet   + '</b> \n' +
-                  'с воркером '   + '«<b>' +  `${itemCW.name ==''? 'default': itemCW.name}` + '</b>»' + '\n' +
+                  'Хешрейт воркера '   + '«<b>' +  `${itemCW.name ==''? 'default': itemCW.name}` + '</b>»' + '\n' +
+                  'кошелька:<b>' + item.wallet   + '</b> \n' +
                   'опустился ниже установленного в <b>'  +  itemCW.hashLevel   +' '  +  itemCW.hashDev + '</b>\n' +
-                  'и составляет <b>'  +  formatHashrate(itemAWhash)+ '</b>\n\n' +
-                  '<b>Внимание! Оповещение об уровне хешрейта отключено.</b>\n' +
+                  'и составляет <b>'  +  formatHashrate(itemAWhash)+ '</b>\n' +
+                  'Оповещение об уровне хешрейта этого воркера <b>отключено</b>.\n' +
                   'Для возобновления оповещения устовновите новый уровень хешрейта для этого воркера', 
                   {parse_mode: 'HTML'}
                 );
@@ -191,17 +191,20 @@ function  getHash(){
             }
         }else{
           if (itemCW.delivered==false){
-            bot.telegram.sendMessage(item.userId,           
+            bot.telegram.sendMessage(item.userId,  
+              '<b>Внимание!</b>\n' +        
               'Воркер '   + '«<b>' +  `${itemCW.name ==''? 'default': itemCW.name}` + '</b>»' + ' для кошелька' +'\n' +
               '<b>' + item.wallet  + '</b>' +'\n' +
-              'больше не существует. Он буде автоматически удален из  Вашего списка контрорлируемых воркеров',
+              '<b><u>не функционирует</u>!</b> \n' +
+              'Он автоматически <b>удален</b> из Вашего списка контролируемых воркеров.\n' + 
+              'Для возобновления оповещения для этого воркера устовновите новый уровень хешрейта',
               {parse_mode: 'HTML'}
             );
             let index = controlledWorkers.findIndex(item=>item.name == itemCW.name);
             if (index != -1){
               controlledWorkers.splice(index, index+1);
-              console.log('Unused worker: «' + itemCW.name + '» of wallet: "' + item.wallet + '" deleted');
-              logIt('Unused worker: «' + itemCW.name + '» of wallet: "' + item.wallet + '" deleted');
+              console.log('Broken worker: «' + itemCW.name + '» of wallet: "' + item.wallet + '" deleted');
+              logIt('Broken worker: «' + itemCW.name + '» of wallet: "' + item.wallet + '" deleted');
            }
           }
         }

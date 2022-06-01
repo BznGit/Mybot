@@ -40,7 +40,7 @@ const subscribe = new Scenes.WizardScene(
       for(let i=0; i<wrk.length; i++){
         text += `${i+1}) «`+ `${wrk[i]}` +'»\n'
       }
-      ctx.reply('Ваши воркеры:\n' + text);
+      ctx.reply('Ваши актуальные воркеры:\n' + text);
       ctx.reply('Выберите нужный на выпадающей клавиатуре или наберите вручную:',
         Markup.keyboard(wrk,{ wrap: (btn, index, currentRow) => currentRow.length >=4 })
         .oneTime().resize())

@@ -34,8 +34,7 @@ const home = new Scenes.WizardScene(
           '<b>- монета: </b>'   + currUser.poolId  + ';\n' +
           '<b>- оповещение о новом блоке: </b>«'  + currUser.block + '»;\n' +
           '<b>- кошелек: </b>'  + currUser.wallet + ';\n' +
-          '<b>- воркеры: </b>\n'  + text + 
-                  
+          '<b>- контролируемые воркеры: </b>\n'  + text + 
           'Выберите:',  {
             parse_mode: 'HTML',
             ...Markup.inlineKeyboard([
