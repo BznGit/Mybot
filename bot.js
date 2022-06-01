@@ -133,8 +133,7 @@ function getBlock(){
         }
       }
     } 
-  })
-  .catch(error => {
+  }).catch(error => {
     console.error('API ERORR! Block request: ', error);
     logIt('API ERORR! Block request: ', error);
     bot.telegram.sendMessage(settings.adminId, 'API ERORR! Block request: \n' + error);
@@ -148,13 +147,25 @@ function  getHash(){
       method: 'get',
       timeout: 2000})
     .then((response)=> {
+      if(response.data.performance==undefined){
+        try{
+          bot.telegram.sendMessage(item.userId,
+            'Ваше кошельк <b>' + item.wallet   + '</b>\n' +
+            'неактуален!'  
+          );
+        }catch(err){
+          console.log('API ERORR! Performance request: ', err);
+          logIt('API ERORR! Performance request: ', err);
+        }
+        return
+      }
       let allWorkers = response.data.performance.workers; // Все сущесивующие воркеры
       let controlledWorkers = item.workers; // Все контрорлируемые воркеры
       //Цикл проверки воркеров ---------------
       controlledWorkers.forEach(itemCW=>{
         if (itemCW.name=='default') itemCW.name= '';
-          let itemAWhash = allWorkers[itemCW.name].hashrate;
-          if (itemAWhash!=undefined){
+          if (allWorkers[itemCW.name]!=undefined){
+            let itemAWhash = allWorkers[itemCW.name].hashrate;
             let itemPorog = itemCW.hashLevel*koeff(itemCW.hashDev)
             if (itemAWhash<itemPorog && itemCW.delivered==false){    
               try{
@@ -179,13 +190,20 @@ function  getHash(){
               
             }
         }else{
-          bot.telegram.sendMessage(item.userId,           
-            'Воркер '   + '<i>«' +  `${itemCW.name ==''? 'default': itemCW.name}` + '»</i>' + ' для кошелька' +'\n' +
-             '<i>' + item.wallet  + '</i>' +'\n' +
-             'больше не существует',
-            {parse_mode: 'HTML'}
-          );
-          itemCW.delivered = true;
+          if (itemCW.delivered==false){
+            bot.telegram.sendMessage(item.userId,           
+              'Воркер '   + '«<b>' +  `${itemCW.name ==''? 'default': itemCW.name}` + '</b>»' + ' для кошелька' +'\n' +
+              '<b>' + item.wallet  + '</b>' +'\n' +
+              'больше не существует. Он буде автоматически удален из  Вашего списка контрорлируемых воркеров',
+              {parse_mode: 'HTML'}
+            );
+            let index = controlledWorkers.findIndex(item=>item.name == itemCW.name);
+            if (index != -1){
+              controlledWorkers.splice(index, index+1);
+              console.log('Unused worker: «' + itemCW.name + '» of wallet: "' + item.wallet + '" deleted');
+              logIt('Unused worker: «' + itemCW.name + '» of wallet: "' + item.wallet + '" deleted');
+           }
+          }
         }
       })
       
@@ -198,7 +216,7 @@ function  getHash(){
     }).catch(function (error){
        console.log('API ERORR! Hashrate request: ', error);
        logIt('API ERORR! Hashrate request: ', error);
-       bot.telegram.sendMessage(settings.adminId, 'API ERORR! Block request: \n' + error);
+       bot.telegram.sendMessage(settings.adminId, 'API ERORR! Hashrate request: \n' + error);
       return
      })
   })

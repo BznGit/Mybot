@@ -45,7 +45,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         // handle success
         //console.log(response.data.performance);
         if (response.data.performance == undefined){
-          ctx.reply('Такого кошелька нет!');
+          ctx.reply('Этот кошелек неактуален или введен с ошибкой!');
           ctx.reply('Введите кошелек заново');
           return
         }
@@ -135,7 +135,7 @@ const chengeSubscribe = new Scenes.WizardScene(
           '<b>- монета: </b>'   + ctx.wizard.state.poolId +  ';\n' +
           '<b>- оповещение о новом блоке:</b> «'  + ctx.wizard.state.block + '»;\n' +
           '<b>- кошелек: </b>'  + ctx.wizard.state.wallet + ';\n' +
-          '<b>- воркеры:</b> \n'  + text + 
+          '<b>- контролируемые воркеры:</b> \n'  + text + 
                   
           '<b>Выберите:</b>',  {
             parse_mode: 'HTML',

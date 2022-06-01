@@ -27,7 +27,7 @@ const subscribe = new Scenes.WizardScene(
       // handle success
       //console.log(response.data.performance);
       if (response.data.performance == undefined){
-        ctx.reply('Такого кошелька нет!');
+        ctx.reply('Этот кошелек неактуален или введен с ошибкой!');
         ctx.reply('Введите кошелек заново');
         return
       }

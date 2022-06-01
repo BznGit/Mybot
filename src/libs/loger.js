@@ -1,13 +1,14 @@
 const fs = require('fs');
 const settings = require('../../botSettings.json');
-let logIt = function(log, ...obj){
+if(!fs.existsSync('./logs.txt')) fs.openSync('./logs.txt','w');
 
+let logIt = function(log, ...obj){
   if(!settings.eventsLoger) return;
   let oldLogs=null
   try{
-    oldLogs = fs.readFileSync('./src/storage/logs.txt', "utf8");
+    oldLogs = fs.readFileSync('./logs.txt', "utf8");
   }catch(err){
-    console.log('Ошибка чтения файла логов: ./src/storage/logs.txt ', err)
+    console.log('Ошибка чтения файла логов: ./logs.txt ', err)
   }
   
   let date = new Date()
@@ -21,13 +22,13 @@ let logIt = function(log, ...obj){
   
   if(oldLogs.indexOf(data)==-1){
     try{
-      fs.appendFileSync('./src/storage/logs.txt', data);
-    }catch(err){console.log('Ошибка записи файла логов: ./src/storage/logs.txt ', err)}
+      fs.appendFileSync('./logs.txt', data);
+    }catch(err){console.log('Ошибка записи файла логов: ./logs.txt ', err)}
   } 
   try{
-    fs.appendFileSync('./src/storage/logs.txt', '     ' +  time +' > ' + log + obj.toString() +'\n'); 
+    fs.appendFileSync('./logs.txt', '     ' +  time +' > ' + log + obj.toString() +'\n'); 
   }catch(err){
-    console.log('Error writing log file: ./src/storage/logs.txt ', err)
+    console.log('Error writing log file: ./logs.txt ', err)
   }
   
    

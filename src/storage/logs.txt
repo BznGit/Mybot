@@ -1,0 +1,19 @@
+01.06.2022 
+     12:42 > Bot started
+     13:02 > New user added: Id -> 886960493
+     13:02 > Total Users: 1
+     13:03 > A hashrate message has been sent to the user: Id -> 886960493
+     13:04 > User data changed: Id -> 886960493
+     13:04 > A hashrate message has been sent to the user: Id -> 886960493
+     13:04 > User data changed: Id -> 886960493
+     13:05 > A hashrate message has been sent to the user: Id -> 886960493
+     13:05 > A hashrate message has been sent to the user: Id -> 886960493
+     13:11 > User data changed: Id -> 886960493
+     13:11 > User data changed: Id -> 886960493
+     13:20 > A hashrate message has been sent to the user: Id -> 886960493
+     13:21 > User data changed: Id -> 886960493
+     14:15 > API ERORR! Hashrate request: Error: timeout of 2000ms exceeded
+     14:26 > A hashrate message has been sent to the user: Id -> 886960493
+     14:29 > API ERORR! Block request: Error: timeout of 2000ms exceeded
+     14:29 > API ERORR! Hashrate request: Error: timeout of 2000ms exceeded
+     15:11 > User data changed: Id -> 886960493
