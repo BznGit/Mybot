@@ -1,7 +1,7 @@
 const fs = require('fs');
 const users = require('../storage/users.json');
 const settings = require('../../botSettings.json');
-const {WizardScene, Scenes, Markup} = require("telegraf");
+const { Scenes, Markup } = require("telegraf");
 const {logIt} = require('../libs/loger');
 // Сцена удаления данных пользователя -------------------------------------------------------------
 const unSubscribe = new Scenes.WizardScene(

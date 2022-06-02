@@ -1,5 +1,5 @@
 const settings = require('./botSettings.json');
-const { Telegraf, Scenes, session, Markup, Extra} = require('telegraf');
+const { Telegraf, Scenes, session, Markup } = require('telegraf');
 const bot = new Telegraf(settings.telegramBotToken);
 const axios = require('axios');
 const api = settings.MiningCoreApiEndpoints +'/api/pools/ethpool/blocks';
