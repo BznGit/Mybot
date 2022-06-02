@@ -6,9 +6,10 @@ const users = require('../storage/users.json');
 const { Scenes, Markup } = require("telegraf");
 const {logIt} = require('../libs/loger');
 
-// Сцена создания нового матча.
+// Сцена регистрации нового пользователя ----------------------------------------------------------
 const subscribe = new Scenes.WizardScene(
-  "subSceneWizard", // Имя сцены
+  "subSceneWizard", 
+    // Шаг 1: Ввод монеты -------------------------------------------------------------------------
     (ctx) => {
     ctx.wizard.state.stepError=false; 
     ctx.reply('Выберите монету:', {
@@ -20,12 +21,10 @@ const subscribe = new Scenes.WizardScene(
     })
     return ctx.wizard.next(); 
   },
-  
+  // Шаг 2: Ввод кошелька -------------------------------------------------------------------------
   (ctx) => {
       axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text)
     .then((response)=> {
-      // handle success
-      //console.log(response.data.performance);
       if (response.data.performance == undefined){
         ctx.reply('Этот кошелек неактуален или введен с ошибкой!');
         ctx.reply('Введите кошелек заново');
@@ -53,11 +52,9 @@ const subscribe = new Scenes.WizardScene(
       ctx.reply('Введены неверные данные попробуйте еще раз!');
       return
     })   
-    
-  }, 
+  },
+  // Шаг 3: Ввод воркера и единицы измерения ------------------------------------------------------
   (ctx) => {
-    //Здесь сделать проверку воркеров !!!!!!! Сделать обработчики ошибок
-  
     if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text) && !ctx.wizard.state.stepError){
       ctx.reply(`Воркера «${ctx.message.text}» не существует!`);
       return 
@@ -78,21 +75,18 @@ const subscribe = new Scenes.WizardScene(
     })
     return ctx.wizard.next(); 
   },     
-
+  // Шаг 4: Ввод хешрейта -------------------------------------------------------------------------
   (ctx) => {
-
     if (ctx.wizard.state.stepError) {
       ctx.reply('Выберите кнопками выше!'); 
       ctx.wizard.state.stepError = true;
       return 
     } 
-    
     let regexp = /^[0-9]+$/;
     if(!regexp.test(ctx.message.text)){
       ctx.reply('Введите число!');
       return 
     } 
-  
     ctx.wizard.state.worker.hashLevel =  ctx.message.text;
     ctx.wizard.state.worker.delivered = false;
     ctx.reply('<u>Ваши данные:</u>\n'+ 
@@ -113,6 +107,7 @@ const subscribe = new Scenes.WizardScene(
     )     
   } 
 );
+// Обработчик выбра монеты Ethereum ---------------------------------------------------------------
 subscribe.action('chooseEth', (ctx)=>{
   ctx.wizard.state.poolId = 'ethpool';
   ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
@@ -123,17 +118,17 @@ subscribe.action('chooseEth', (ctx)=>{
     ])
   }) 
 });
-
+// Обработчик подписки на блок Ethereum -----------------------------------------------------------
 subscribe.action('subBlockEth',  (ctx)=>{
   ctx.wizard.state.block = 'да'
   ctx.reply('Введите ethereum кошелек:');
 });
-
+// Обработчик подписки на блок Ethereum -----------------------------------------------------------
 subscribe.action('notSubBlockEth',  (ctx)=>{
   ctx.wizard.state.block = 'нет'
   ctx.reply('Введите ethereum кошелек:');
 });
-
+// Обработчик выбра монеты Ergo -------------------------------------------------------------------
 subscribe.action('chooseErgo',  (ctx)=>{
   ctx.wizard.state.poolId = 'ergopool'
   ctx.reply('Подписаться на оповещение о новом блоке ergo?', {
@@ -144,17 +139,17 @@ subscribe.action('chooseErgo',  (ctx)=>{
     ])
   }) 
 });
-
+// Обработчик подписки на блок Ergo ---------------------------------------------------------------
 subscribe.action('subBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'да'
   ctx.reply('Введите ergo кошелек:');
 });
-
+// Обработчик подписки на блок Ergo ---------------------------------------------------------------
 subscribe.action('notSubBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'нет'
   ctx.reply('Введите ergo кошелек:');
 });
-
+// Обработчики выбора единиц измерения ------------------------------------------------------------
 subscribe.action('chooseK',  (ctx)=>{
   ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'KH/s'
@@ -180,9 +175,9 @@ subscribe.action('chooseP',  (ctx)=>{
   ctx.wizard.state.worker.hashDev = 'PH/s'
   ctx.reply('Введите значение порогового уровня хашрейта в PH/s:');
 });
-//Добавление нового пльзователя -----------------------
+// Обработчик добавления пользователя -------------------------------------------------------------
 subscribe.action('subHash', (ctx)=>{
-  ctx.reply('Вы подписаны наоповещение от бота!')
+  ctx.reply('Вы подписаны на оповещение о хешрейте!')
   let curUser = {
     userId: ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
@@ -191,6 +186,7 @@ subscribe.action('subHash', (ctx)=>{
     workers : [ctx.wizard.state.worker]
   };
   users.push(curUser);
+  //Запись данных пользователя в файл -------------------------------------------------------------
   try{
     fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
     console.log('New user added: Id -> ', curUser.userId);
@@ -208,8 +204,7 @@ subscribe.action('subHash', (ctx)=>{
      ])
  })
 });
- //------------------------------------------------------- 
-  
+ // Обработчик кнопки "назад" ---------------------------------------------------------------------
 subscribe.action('back', (ctx)=> {
   ctx.scene.leave();
   ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
@@ -218,7 +213,7 @@ subscribe.action('back', (ctx)=> {
       ])
   })
 });
-
+ // Обработчик команды "назад" --------------------------------------------------------------------
 subscribe.command('/back', (ctx) => {
   ctx.scene.leave();
   ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
@@ -227,7 +222,6 @@ subscribe.command('/back', (ctx) => {
       ])
   })
 })
-  
 
 module.exports = subscribe;
 

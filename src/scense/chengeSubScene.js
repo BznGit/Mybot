@@ -5,12 +5,11 @@ const api = settings.MiningCoreApiEndpoints;
 const users = require('../storage/users.json');
 const { Scenes, Markup } = require("telegraf");
 const {logIt} = require('../libs/loger');
-// Сцена создания нового матча.
+// Сцена изменения данных пользователя ------------------------------------------------------------
 const chengeSubscribe = new Scenes.WizardScene(
-    "chengeSubSceneWizard", // Имя сцены
-    // step #0 --------------------------------------------------
+    "chengeSubSceneWizard", 
+    // Получение исходных данных пользователя -----------------------------------------------------
     (ctx)=>{
- 
       let  curUser = users.find(item=>item.userId == ctx.chat.id);
       let tempArr = JSON.parse(JSON.stringify(curUser.workers));
 
@@ -27,7 +26,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         ]) 
       })  
     },
-    // step #1 ---------------------------------------------------
+    // Шаг 1: Изменение монеты --------------------------------------------------------------------
     (ctx) => {
       ctx.reply('Выберите монету:', {
         parse_mode: 'HTML',
@@ -38,7 +37,7 @@ const chengeSubscribe = new Scenes.WizardScene(
       })
       return ctx.wizard.next(); 
     },
-    // step #2 ---------------------------------------------------
+     // Шаг 2: Изменение кошелька ------------------------------------------------------------------
     (ctx) => {
        axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.message.text)
       .then((response)=> {
@@ -69,7 +68,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         return
       })    
     }, 
-    // step #3 ------------------------------------------------------------
+    // Шаг 3: Изменение воркера и единицы измерения -----------------------------------------------
     (ctx) => {
       if (!ctx.wizard.state.tempWorkerNames.includes(ctx.message.text) && !ctx.wizard.state.stepError){
         ctx.reply(`Воркера «${ctx.message.text}» не существует!`);
@@ -77,25 +76,18 @@ const chengeSubscribe = new Scenes.WizardScene(
       }
       let currWorkers = ctx.wizard.state.workers;
       let choosedWorker = ctx.message.text;
-      //console.log('choosedWorker>',choosedWorker);
-      //console.log('currWorkers>',currWorkers);
+      
       let curWorkerIndex = currWorkers.findIndex(item=>item.name == choosedWorker);
-     // console.log(' index>',curWorkerIndex)
       if (curWorkerIndex!=-1){
         ctx.wizard.state.curWorkerIndex = curWorkerIndex;
-        //console.log('---->',ctx.wizard.state.curWorkerIndex);
- 
-      } else {
-        
+      } else {  
         let worker = {
           name: ctx.message.text,
           hashLevel: null,
           hashDev: null,
           delivered: false
         }
-        
         ctx.wizard.state.tempWorker = worker;
-        //console.log('---->', ctx.wizard.state.workers);
       }
       ctx.wizard.state.stepError = true;
       ctx.reply('Выберите размерность порогового уровня хешрейта:', {
@@ -106,11 +98,9 @@ const chengeSubscribe = new Scenes.WizardScene(
         ])
       })
       return ctx.wizard.next()
-       
     },     
-    // step #4 -------------------------------------------------   
+    // Шаг 4: Изменение хешрейта ------------------------------------------------------------------
     (ctx) => {
-      
       if (ctx.wizard.state.stepError) {
         ctx.reply('Выберите кнопками выше!'); 
         ctx.wizard.state.stepError = true;
@@ -149,7 +139,7 @@ const chengeSubscribe = new Scenes.WizardScene(
             }) 
           );
       } else{
-        //Проверка на несуществующий воркер ----------------------------
+        //Проверка на несуществующий воркер -------------------------------------------------------
         ctx.wizard.state.tempWorker.hashLevel =  ctx.message.text;
         ctx.wizard.state.tempWorker.delivered = false;
         ctx.reply('<u>Ваши новые данные:</u>\n'+ 
@@ -171,34 +161,29 @@ const chengeSubscribe = new Scenes.WizardScene(
       }       
     }, 
 );
-
+// Обработчик изменения монеты --------------------------------------------------------------------
 chengeSubscribe.action('chooseCoin',  (ctx)=>{
   ctx.wizard.state.wallet = null;
   ctx.wizard.state.workers = [];
   ctx.wizard.steps[1](ctx);
-  //console.log('cursor: ', ctx.wizard.cursor);
 });
-
+// Обработчик изменения кошелька ------------------------------------------------------------------
 chengeSubscribe.action('chooseWallet',  (ctx)=>{
   ctx.wizard.state.wallet = null;
   ctx.wizard.state.workers = [];
   ctx.reply('Введите кошелек:')
   ctx.wizard.selectStep(2);
- // console.log('cursor: ', ctx.wizard.cursor);
 });
-
+// Обработчик изменения воркера -------------------------------------------------------------------
 chengeSubscribe.action('chooseWorker',  (ctx)=>{
   axios.get(api + '/api/pools/' + ctx.wizard.state.poolId + '/miners/' + ctx.wizard.state.wallet)
   .then((response)=> {
-    // handle success
-    //console.log(response.data.performance);
     if (response.data.performance == undefined){
       ctx.reply('Такого кошелька нет!');
       ctx.reply('Введите кошелек заново');
       return
     }
     ctx.wizard.selectStep(2);
-    //console.log('cursor: ', ctx.wizard.cursor);
     let wrk= Object.keys(response.data.performance.workers);
     ctx.wizard.state.tempWorkerNames = wrk;
     let text='';
@@ -207,26 +192,17 @@ chengeSubscribe.action('chooseWorker',  (ctx)=>{
     }
     ctx.reply('Ваши воркеры:\n' + text);
     ctx.reply('Выберите нужный на выпадающей клавиатуре или наберите вручную:',
-      Markup.keyboard(wrk,{ wrap: (btn, index, currentRow) => currentRow.length >=4 })
-      .oneTime().resize())
-    
-    return ctx.wizard.next();        
-     
-  }).catch(function (error) {
-    // handle error
+      Markup.keyboard(wrk,{ wrap: (btn, index, currentRow) => currentRow.length >=4 }).oneTime().resize()
+    );
+    return ctx.wizard.next();          
+  }).catch(function (error){
     console.log('request error when updating worker: ', error);
     logIt('request error when updating worker: ', error);
     ctx.reply('Введены неверные данные попробуйте еще раз!');
     return
   }) 
 });
-
-chengeSubscribe.action('chooseHash',  (ctx)=>{
-  ctx.wizard.steps[3](ctx);
-  ctx.wizard.selectStep(4);
- // console.log('cursor: ', ctx.wizard.cursor);
-});
-
+// Обработчик изменения подписки на блок ----------------------------------------------------------
 chengeSubscribe.action('chooseblock',  (ctx)=>{
   if (ctx.wizard.state.block =='нет'){
     ctx.wizard.state.block ='да'
@@ -246,7 +222,7 @@ chengeSubscribe.action('chooseblock',  (ctx)=>{
    }) 
   } 
 });
-
+// Обработчик изменения монеты Ethereum -----------------------------------------------------------
 chengeSubscribe.action('chooseEth', (ctx)=>{
   ctx.wizard.state.poolId = 'ethpool';
   ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
@@ -258,18 +234,18 @@ chengeSubscribe.action('chooseEth', (ctx)=>{
   }) 
   
 });
-
+// Обработчик изменения подписки на блок Ethereum -------------------------------------------------
 chengeSubscribe.action('subBlockEth',  (ctx)=>{
   ctx.wizard.state.block = 'да'
   ctx.reply('Введите ethereum кошелек:');
   return ctx.wizard.next(); 
 });
-
+// Обработчик изменения подписки на блок Ethereum -------------------------------------------------
 chengeSubscribe.action('notSubBlockEth',  (ctx)=>{
   ctx.wizard.state.block = 'нет'
   ctx.reply('Введите ethereum кошелек:');
 });
-
+// Обработчик изменения монеты Ergo ---------------------------------------------------------------
 chengeSubscribe.action('chooseErgo',  (ctx)=>{
   ctx.wizard.state.poolId = 'ergopool'
   ctx.reply('Подписаться на оповещение о новом блоке ergo?', {
@@ -280,18 +256,18 @@ chengeSubscribe.action('chooseErgo',  (ctx)=>{
     ])
   }) 
 });
-
+// Обработчик изменения подписки на блок Ergo -----------------------------------------------------
 chengeSubscribe.action('subBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'да'
   ctx.reply('Введите ergo кошелек:');
   return ctx.wizard.next(); 
 });
-
+// Обработчик изменения подписки на блок Ergo -----------------------------------------------------
 chengeSubscribe.action('notSubBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'нет'
   ctx.reply('Введите ergo кошелек:');
 });
-// Выбор единиц измерения хешрейта----------------------------------------------
+// Обработчики изменения единиц измерения ---------------------------------------------------------
 chengeSubscribe.action('chooseK',  (ctx)=>{
   if (ctx.wizard.state.curWorkerIndex!==undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'KH/s';
@@ -326,12 +302,10 @@ chengeSubscribe.action('chooseP',  (ctx)=>{
   else  ctx.wizard.state.tempWorker.hashDev  = 'PH/s';
   ctx.reply('Введите значение порогового уровня хашрейта в PH/s:');
 });
-//---------------------------------------------------------------
-
+// Обработчик добавления изменений пользователя ---------------------------------------------------
 chengeSubscribe.action('subHash', (ctx)=>{
   if(ctx.wizard.state.tempWorker!=undefined){
-    ctx.wizard.state.workers.push(ctx.wizard.state.tempWorker)
-    
+    ctx.wizard.state.workers.push(ctx.wizard.state.tempWorker) 
   }
   let changedUser = {
     userId  : ctx.chat.id,
@@ -340,40 +314,34 @@ chengeSubscribe.action('subHash', (ctx)=>{
     block   : ctx.wizard.state.block, 
     workers : ctx.wizard.state.workers,
   };
-  
   let index = users.findIndex(item=>item.userId == ctx.chat.id);
-  //console.log('index=>',index)
   if (index != -1){
     users.splice(index, index+1);
     users.push(changedUser);
-   // console.log('User chenged: ', newUser);
-   // console.log('All current users: ', users);
+    //Запись изменений пользователя в файл --------------------------------------------------------
     try{
-     
       fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
       console.log('User data changed: Id -> ', changedUser.userId);
       logIt('User data changed: Id -> ', changedUser.userId);
-      
     }catch(err){
       console.log('Error writing to user changes file: ', err);
       logIt('Error writing to user changes file: ', err);
     }
-   
     ctx.reply('Ваши данные изменены!');
     ctx.scene.leave();
     ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
-    ...Markup.inlineKeyboard([
+      ...Markup.inlineKeyboard([
      { text: "Продолжить", callback_data: 'onStart' },    
       ])
-  })
+    })
   }
 });
-  
+ // Обработчик кнопки "назад" ---------------------------------------------------------------------
 chengeSubscribe.action('back', (ctx)=> {
   ctx.scene.leave();
   ctx.scene.enter("homeSceneWizard")  
 });
-
+// Обработчик команды "назад" --------------------------------------------------------------------
 chengeSubscribe.command('/back', (ctx) => {
   ctx.scene.leave();
   ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
@@ -382,7 +350,6 @@ chengeSubscribe.command('/back', (ctx) => {
       ])
   })
 })
-  
 
 module.exports = chengeSubscribe;
 

@@ -3,7 +3,7 @@ const users = require('../storage/users.json');
 const settings = require('../../botSettings.json');
 const {WizardScene, Scenes, Markup} = require("telegraf");
 const {logIt} = require('../libs/loger');
-// Сцена создания нового матча.
+
 const home = new Scenes.WizardScene(
   "homeSceneWizard", // Имя сцены
   (ctx)=>{

@@ -14,13 +14,15 @@ const {koeff} = require('./src/libs/utils.js');
 const {logIt} = require('./src/libs/loger.js');
 const fs = require('fs');
 
-// Создаем менеджера сцен
+// Создание менеджера сцен ------------------------------------------------------------------------
 const stage = new Scenes.Stage();
 stage.register( home, subscribe, unSubscribe, chengeSubscribe);
+// Непосредственный запуск опроса------------------------------------------------------------------
 begin();
+// Создание менеджера сцен ------------------------------------------------------------------------
 bot.use(session());
 bot.use(stage.middleware());
-
+// Действия бота при старте -----------------------------------------------------------------------
 bot.start((ctx) =>{
   if (ctx.from.id != settings.adminId && ctx.chat.type =='group'){
     ctx.reply('У Вас недостаточно прав для выполнения этой команды');
@@ -32,24 +34,22 @@ bot.start((ctx) =>{
       ])
   })
 })
-
+// Обработчик события при старте ------------------------------------------------------------------
 bot.action('onStart', (ctx)=>{
   ctx.scene.enter("homeSceneWizard")
 })
-
-// Запуск бота
+// Запуск бота-------------------------------------------------------------------------------------
 bot.launch();
-
-var lastBlock = null;
-var tempBlock  =null;
+// Установка параметров запуска бота --------------------------------------------------------------
 function start(){
   setInterval(getBlock, settings.monitoringPeriodSec*1000);
   setInterval(getHash, settings.monitoringPeriodSec*1000)
   console.log('Bot started');
   logIt('Bot started');
 };
-
-//Получение номера последнего блока
+// Получение номера последнего блока---------------------------------------------------------------
+var lastBlock = null;
+var tempBlock  =null;
 function begin(){
   axios.get(api).then(res => {
   lastBlock = {
@@ -59,7 +59,7 @@ function begin(){
   start();
   })
 }
-
+// Проверка появления нового блок -----------------------------------------------------------------
 function getBlock(){
   axios({
     url: api,
@@ -68,6 +68,7 @@ function getBlock(){
   }).then(res => {
     let currBlock = res.data[0];
     if (tempBlock != null){   
+      // Подтверждение нового блока ---------------------------------------------------------------
       if (currBlock.blockHeight==tempBlock.blockHeight && currBlock.status=='confirmed'){
         //console.log('Active users:', users);
         if (users.length!=0){        
@@ -103,11 +104,11 @@ function getBlock(){
         tempBlock = null;
       }
     } else {
+      // Проверка появления нового блока ----------------------------------------------------------
         if (lastBlock.blockHeight == currBlock.blockHeight){
         if (users.length!=0){        
           users.forEach(item => {
             if (item.block =='да'){
-            
               try{
                 bot.telegram.sendMessage(item.userId,
                   '<b>Найден новый блок!</b>\n'+
@@ -139,7 +140,7 @@ function getBlock(){
     bot.telegram.sendMessage(settings.adminId, 'API ERORR! Block request: \n' + error);
   })
 };
-
+// Проверка хешрета воркеров ----------------------------------------------------------------------
 function  getHash(){
   users.forEach(item =>{
     axios({
@@ -161,7 +162,7 @@ function  getHash(){
       }
       let allWorkers = response.data.performance.workers; // Все сущесивующие воркеры
       let controlledWorkers = item.workers; // Все контрорлируемые воркеры
-      //Цикл проверки воркеров ---------------
+      // Цикл проверки воркеров -------------------------------------------------------------------
       controlledWorkers.forEach(itemCW=>{
         if (itemCW.name=='default') itemCW.name= '';
           if (allWorkers[itemCW.name]!=undefined){
@@ -186,8 +187,7 @@ function  getHash(){
                 console.log('Error sending message about hashrate! ', err);
                 logIt('Error sending message about hashrate! ', err);
                 bot.telegram.sendMessage(settings.adminId, 'Error sending message about hashrate!  \n' + err);
-              }
-              
+              }    
             }
         }else{
           if (itemCW.delivered==false){
@@ -208,9 +208,8 @@ function  getHash(){
            }
           }
         }
-      })
-      
-      //-------------------------------------------
+      })//-----------------------------------------------------------------------------------------
+
       if (response.data.performance == undefined){
         console.log('Hash polling error!');
         logIt('Hash polling error! bot.js 194 стр');
@@ -223,6 +222,7 @@ function  getHash(){
       return
      })
   })
+  // Запись новых данных о пользователях в файл ---------------------------------------------------
   try{
      fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
   }catch(err){
