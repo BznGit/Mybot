@@ -7,15 +7,15 @@ const {logIt} = require('../libs/loger');
 const unSubscribe = new Scenes.WizardScene(
   "unSubSceneWizard", 
   // Шаг 1: Подтверждение удаления данных пользователя --------------------------------------------
-    (ctx) => {
-      ctx.reply('Вы действительно хотие полностью отписатья от поповещения!', {
-        parse_mode: 'HTML',
-        ...Markup.inlineKeyboard([
-          Markup.button.callback ('Да','chooseUnSub'),
-          Markup.button.callback('Нет', 'back'),        
-        ])    
-      })
-    }
+  (ctx) => {
+    ctx.reply('Вы действительно хотие полностью отписатья от поповещения!', {
+      parse_mode: 'HTML',
+      ...Markup.inlineKeyboard([
+        Markup.button.callback ('Да','chooseUnSub'),
+        Markup.button.callback('Нет', 'back'),        
+      ])    
+    })
+  }
 );
 // Обработчик удаления данных пользователя --------------------------------------------------------
 unSubscribe.action('chooseUnSub', (ctx)=>{
