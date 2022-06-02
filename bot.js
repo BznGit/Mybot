@@ -49,16 +49,18 @@ function start(){
 };
 // Получение номера последнего блока---------------------------------------------------------------
 var lastBlock = null;
-var tempBlock  =null;
+var tempBlock = null;
 function begin(){
   axios.get(api).then(res => {
   lastBlock = {
-    height:res.data[0].blockHeight,
+    blockHeight:res.data[0].blockHeight,
     status: res.data[0].status
   } 
+  
   start();
   })
 }
+
 // Проверка появления нового блок -----------------------------------------------------------------
 function getBlock(){
   axios({
@@ -67,6 +69,7 @@ function getBlock(){
     timeout: 2000
   }).then(res => {
     let currBlock = res.data[0];
+
     if (tempBlock != null){   
       // Подтверждение нового блока ---------------------------------------------------------------
       if (currBlock.blockHeight==tempBlock.blockHeight && currBlock.status=='confirmed'){
@@ -104,8 +107,8 @@ function getBlock(){
         tempBlock = null;
       }
     } else {
-      // Проверка появления нового блока ----------------------------------------------------------
-        if (lastBlock.blockHeight == currBlock.blockHeight){
+        // Проверка появления нового блока ----------------------------------------------------------
+      if (lastBlock.blockHeight != currBlock.blockHeight){
         if (users.length!=0){        
           users.forEach(item => {
             if (item.block =='да'){
