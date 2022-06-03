@@ -8,7 +8,7 @@ const unSubscribe = new Scenes.WizardScene(
   "unSubSceneWizard", 
   // Шаг 1: Подтверждение удаления данных пользователя --------------------------------------------
   (ctx) => {
-    ctx.reply('Вы действительно хотие полностью отписатья от поповещения!', {
+    ctx.reply('Вы действительно хотите отписатьcя от всех оповещений?', {
       parse_mode: 'HTML',
       ...Markup.inlineKeyboard([
         Markup.button.callback ('Да','chooseUnSub'),
@@ -37,8 +37,8 @@ unSubscribe.action('chooseUnSub', (ctx)=>{
         ])
       })
     }catch(err){
-      console.log('rror writing user deletion information to file: ', err);
-      logIt('rror writing user deletion information to file: ', err);
+      console.log('error writing user deletion information to file: ', err);
+      logIt('error writing user deletion information to file: ', err);
     }
     ctx.scene.leave();
     ctx.reply(settings.wellcomeText, {parse_mode: 'HTML',
