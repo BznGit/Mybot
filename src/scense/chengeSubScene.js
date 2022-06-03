@@ -272,28 +272,28 @@ chengeSubscribe.action('chooseK',  (ctx)=>{
   if (ctx.wizard.state.curWorkerIndex!==undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'KH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'KH/s';
-  ctx.reply('Введите значение порогового уровня хашрейта в KH/s:');
+  ctx.reply('Введите значение порогового уровня хешрейта в KH/s:');
 });
 chengeSubscribe.action('chooseM',  (ctx)=>{
   ctx.wizard.state.stepError = false;
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'MH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'MH/s';
-  ctx.reply('Введите значение порогового уровня хашрейта в MH/s:');
+  ctx.reply('Введите значение порогового уровня хешрейта в MH/s:');
 });
 chengeSubscribe.action('chooseG',  (ctx)=>{
   ctx.wizard.state.stepError = false;
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'GH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'GH/s';
-  ctx.reply('Введите значение порогового уровня хашрейта в GH/s:');
+  ctx.reply('Введите значение порогового уровня хешрейта в GH/s:');
 });
 chengeSubscribe.action('chooseT',  (ctx)=>{
   ctx.wizard.state.stepError = false;
   if (ctx.wizard.state.curWorkerIndex!=undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'TH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'TH/s';
-  ctx.reply('Введите значение порогового уровня хашрейта в TH/s:');
+  ctx.reply('Введите значение порогового уровня хешрейта в TH/s:');
   });
 chengeSubscribe.action('chooseP',  (ctx)=>{
   ctx.wizard.state.stepError = false;

@@ -158,22 +158,22 @@ subscribe.action('chooseK',  (ctx)=>{
 subscribe.action('chooseM',  (ctx)=>{
   ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'MH/s'
-  ctx.reply('Введите значение порогового уровня хашрейта в MH/s:');
+  ctx.reply('Введите значение порогового уровня хешрейта в MH/s:');
 });
 subscribe.action('chooseG',  (ctx)=>{
   ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'GH/s'
-  ctx.reply('Введите значение порогового уровня хашрейта в GH/s:');
+  ctx.reply('Введите значение порогового уровня хешрейта в GH/s:');
 });
 subscribe.action('chooseT',  (ctx)=>{
   ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'TH/s'
-  ctx.reply('Введите значение порогового уровня хашрейта в TH/s:');
+  ctx.reply('Введите значение порогового уровня хешрейта в TH/s:');
 });
 subscribe.action('chooseP',  (ctx)=>{
   ctx.wizard.state.stepError = false;
   ctx.wizard.state.worker.hashDev = 'PH/s'
-  ctx.reply('Введите значение порогового уровня хашрейта в PH/s:');
+  ctx.reply('Введите значение порогового уровня хешрейта в PH/s:');
 });
 // Обработчик добавления пользователя -------------------------------------------------------------
 subscribe.action('subHash', (ctx)=>{
