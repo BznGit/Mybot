@@ -22,7 +22,7 @@ const chengeSubscribe = new Scenes.WizardScene(
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
           [{ text: "Монета", callback_data: "chooseCoin" }, { text: "Кошелек", callback_data: "chooseWallet" },{ text: "Воркеры", callback_data: "chooseWorker" }],
-          [{ text: "Оповещение о облоке", callback_data: "chooseblock" }],                
+          [{ text: "Оповещение о блоке", callback_data: "chooseblock" }],                
         ]) 
       })  
     },
