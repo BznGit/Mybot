@@ -269,6 +269,7 @@ chengeSubscribe.action('notSubBlockErgo',  (ctx)=>{
 });
 // Обработчики изменения единиц измерения ---------------------------------------------------------
 chengeSubscribe.action('chooseK',  (ctx)=>{
+  ctx.wizard.state.stepError = false;
   if (ctx.wizard.state.curWorkerIndex!==undefined)
     ctx.wizard.state.workers[ctx.wizard.state.curWorkerIndex].hashDev = 'KH/s';
   else ctx.wizard.state.tempWorker.hashDev  = 'KH/s';
