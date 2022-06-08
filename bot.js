@@ -56,11 +56,9 @@ function begin(){
     blockHeight:res.data[0].blockHeight,
     status: res.data[0].status
   } 
-  
   start();
   })
 }
-
 // Проверка появления нового блок -----------------------------------------------------------------
 function getBlock(){
   axios({
@@ -197,13 +195,13 @@ function  getHash(){
                   'опустился ниже установленного в <b>'  +  itemCW.hashLevel   +' '  +  itemCW.hashDev + '</b>\n' +
                   'и составляет <b>'  +  formatHashrate(itemAWhash)+ '</b>\n' +
                   'Оповещение об уровне хешрейта этого воркера <b>отключено!</b>.\n' +
-                  'Для возобновления оповещения устовновите новый уровень хешрейта для этого воркера', 
+                  'Для возобновления оповещения для этого воркера устовновите новый уровень хешрейта', 
                   {parse_mode: 'HTML'}
                 );
                 itemCW.delivered = true;
-                saveChanges()
                 console.log('A hashrate message has been sent to the user: Id -> ', item.userId);
                 logIt('A hashrate message has been sent to the user: Id -> ', item.userId);
+                saveChanges()
               }catch(err){
                 console.log('Error sending message about hashrate! ', err);
                 logIt('Error sending message about hashrate! ', err);
@@ -224,14 +222,14 @@ function  getHash(){
             let index = controlledWorkers.findIndex(item=>item.name == itemCW.name);
             if (index != -1){
               controlledWorkers.splice(index, index+1);
-              console.log('Broken worker: «' + itemCW.name + '» of wallet: "' + item.wallet + '" deleted');
-              logIt('Broken worker: «' + itemCW.name + '» of wallet: "' + item.wallet + '" deleted');
+              console.log('Broken worker: «' + itemCW.name + '» of wallet: "' + item.wallet + ' deleted!');
+              logIt('Broken worker: «' + itemCW.name + '» of wallet ' + item.wallet + ' deleted!');
               saveChanges();
            }
           }
         }
-      })//-----------------------------------------------------------------------------------------
-
+      })
+      //-------------------------------------------------------------------------------------------
       if (response.data.performance == undefined){
         console.log('Hash polling error!');
         logIt('Hash polling error! bot.js 194 стр');
@@ -245,8 +243,7 @@ function  getHash(){
      })
   })
 }
-
-// Запись новых данных о пользователях в файл ---------------------------------------------------
+// Запись новых данных о пользователях в файл -----------------------------------------------------
 function saveChanges(){
   try{
   fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
