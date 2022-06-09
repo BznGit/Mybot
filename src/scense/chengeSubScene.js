@@ -28,11 +28,12 @@ const chengeSubscribe = new Scenes.WizardScene(
     },
     // Шаг 1: Изменение монеты --------------------------------------------------------------------
     (ctx) => {
-      ctx.reply('Выберите монету:', {
+      ctx.reply('Выберите одну из монет пула:', {
         parse_mode: 'HTML',
         ...Markup.inlineKeyboard([
           Markup.button.callback ('Ethereum','chooseEth'),
-          Markup.button.callback('Ergo', 'chooseErgo'),        
+          Markup.button.callback('Ergo', 'chooseErgo'),  
+          Markup.button.callback('Vertcoin', 'chooseVert'),        
         ])    
       })
       return ctx.wizard.next(); 
@@ -225,30 +226,31 @@ chengeSubscribe.action('chooseblock',  (ctx)=>{
 // Обработчик изменения монеты Ethereum -----------------------------------------------------------
 chengeSubscribe.action('chooseEth', (ctx)=>{
   ctx.wizard.state.poolId = 'ethpool';
-  ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
+  ctx.reply('Подписаться на оповещение о новом блоке Ethereum?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
       { text: "Да", callback_data: 'subBlockEth' }, 
       { text: "Нет", callback_data: 'notSubBlockEth' }
     ])
   }) 
-  
 });
+// Ethereum ---------------------------------------------------------------------------------------
 // Обработчик изменения подписки на блок Ethereum -------------------------------------------------
 chengeSubscribe.action('subBlockEth',  (ctx)=>{
   ctx.wizard.state.block = 'да'
-  ctx.reply('Введите ethereum кошелек:');
+  ctx.reply('Введите Ethereum кошелек:');
   return ctx.wizard.next(); 
 });
 // Обработчик изменения подписки на блок Ethereum -------------------------------------------------
 chengeSubscribe.action('notSubBlockEth',  (ctx)=>{
   ctx.wizard.state.block = 'нет'
-  ctx.reply('Введите ethereum кошелек:');
+  ctx.reply('Введите Ethereum кошелек:');
 });
+// Ergo -------------------------------------------------------------------------------------------
 // Обработчик изменения монеты Ergo ---------------------------------------------------------------
 chengeSubscribe.action('chooseErgo',  (ctx)=>{
   ctx.wizard.state.poolId = 'ergopool'
-  ctx.reply('Подписаться на оповещение о новом блоке ergo?', {
+  ctx.reply('Подписаться на оповещение о новом блоке Ergo?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
       { text: "Да'", callback_data: 'subBlockErgo' }, 
@@ -259,14 +261,37 @@ chengeSubscribe.action('chooseErgo',  (ctx)=>{
 // Обработчик изменения подписки на блок Ergo -----------------------------------------------------
 chengeSubscribe.action('subBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'да'
-  ctx.reply('Введите ergo кошелек:');
+  ctx.reply('Введите Ergo кошелек:');
   return ctx.wizard.next(); 
 });
 // Обработчик изменения подписки на блок Ergo -----------------------------------------------------
 chengeSubscribe.action('notSubBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'нет'
-  ctx.reply('Введите ergo кошелек:');
+  ctx.reply('Введите Ergo кошелек:');
 });
+// Vertcoin ---------------------------------------------------------------------------------------
+// Обработчик выбра монеты Vertcoin ---------------------------------------------------------------
+chengeSubscribe.action('chooseVert', (ctx)=>{
+  ctx.wizard.state.poolId = 'vtcpool';
+  ctx.reply('Подписаться на оповещение о новом блоке Vertcoin?', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      { text: "Да", callback_data: 'subBlockVert' }, 
+      { text: "Нет", callback_data: 'notSubBlockVert' }
+    ])
+  }) 
+});
+// Обработчик подписки на блок Vertcoin -----------------------------------------------------------
+chengeSubscribe.action('subBlockVert',  (ctx)=>{
+  ctx.wizard.state.block = 'да'
+  ctx.reply('Введите Vertcoin кошелек:');
+});
+// Обработчик подписки на блок Vertcoin -----------------------------------------------------------
+chengeSubscribe.action('notSubBlockVert',  (ctx)=>{
+  ctx.wizard.state.block = 'нет'
+  ctx.reply('Введите Vertcoin кошелек:');
+});
+//-------------------------------------------------------------------------------------------------
 // Обработчики изменения единиц измерения ---------------------------------------------------------
 chengeSubscribe.action('chooseK',  (ctx)=>{
   ctx.wizard.state.stepError = false;

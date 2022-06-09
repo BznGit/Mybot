@@ -8,6 +8,7 @@ const home = require('./src/scense/homeScene');
 const unSubscribe = require('./src/scense/unSubScene');
 const subscribe = require('./src/scense/subScene');
 const chengeSubscribe = require('./src/scense/chengeSubScene');
+const onBlock = require('./src/scense/blockScene');
 const users = require('./src/storage/users.json');
 const {formatHashrate} = require('./src/libs/utils.js');
 const {koeff} = require('./src/libs/utils.js');
@@ -16,7 +17,7 @@ const fs = require('fs');
 
 // Создание менеджера сцен ------------------------------------------------------------------------
 const stage = new Scenes.Stage();
-stage.register( home, subscribe, unSubscribe, chengeSubscribe);
+stage.register( home, subscribe, unSubscribe, chengeSubscribe, onBlock);
 // Непосредственный запуск опроса------------------------------------------------------------------
 begin();
 // Создание менеджера сцен ------------------------------------------------------------------------
@@ -248,8 +249,8 @@ function saveChanges(){
   try{
   fs.writeFileSync('./src/storage/users.json', JSON.stringify(users));
   }catch(err){
-    console.log('Error writing to the information file of the delivered message: ',err);
-    logIt('Error writing to the information file of the delivered message: ',err);
+    console.log('Error writing to the information file of the delivered message: ', err);
+    logIt('Error writing to the information file of the delivered message: ', err);
   }
 }
 // ------------------------------------------------------------------------------------------------  

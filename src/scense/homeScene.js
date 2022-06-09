@@ -14,7 +14,8 @@ const home = new Scenes.WizardScene(
           return  ctx.reply('Сейчас у Вас нет подписки на оповещение о появлении нового блока и падении текущего хешрейта воркеров', {
                     parse_mode: 'HTML',
                     ...Markup.inlineKeyboard([
-                       Markup.button.callback('Подписаться на оповещение', 'onSub'),    
+                       Markup.button.callback('Подписаться на оповещение о хешрейте', 'onSub'),
+                       Markup.button.callback('Подписаться на оповещение о новом блоке', 'blockSub'),       
                     ])
                   })
       }catch(err){
@@ -59,6 +60,10 @@ home.action('unSub', (ctx)=>{
 // Обработчик кнопки "Изменить..." ----------------------------------------------------------------
 home.action('chengeSub', (ctx)=>{
   ctx.scene.enter("chengeSubSceneWizard")  
+});
+// Обработчик кнопки "... о новом блоке" ----------------------------------------------------------------
+home.action('blockSub', (ctx)=>{
+  ctx.scene.enter("blockSceneWizard")  
 });
  // Обработчик кнопки "назад" ---------------------------------------------------------------------
 home.action('back', (ctx)=>{

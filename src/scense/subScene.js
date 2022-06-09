@@ -12,11 +12,12 @@ const subscribe = new Scenes.WizardScene(
     // Шаг 1: Ввод монеты -------------------------------------------------------------------------
     (ctx) => {
     ctx.wizard.state.stepError=false; 
-    ctx.reply('Выберите монету:', {
+    ctx.reply('Выберите одну из монет пула:', {
       parse_mode: 'HTML',
       ...Markup.inlineKeyboard([
         Markup.button.callback ('Ethereum','chooseEth'),
-        Markup.button.callback('Ergo', 'chooseErgo'),        
+        Markup.button.callback('Ergo', 'chooseErgo'),
+        Markup.button.callback('Vertcoin', 'chooseVert'),              
       ])    
     })
     return ctx.wizard.next(); 
@@ -107,10 +108,11 @@ const subscribe = new Scenes.WizardScene(
     )     
   } 
 );
+// Ethereum ---------------------------------------------------------------------------------------
 // Обработчик выбра монеты Ethereum ---------------------------------------------------------------
 subscribe.action('chooseEth', (ctx)=>{
   ctx.wizard.state.poolId = 'ethpool';
-  ctx.reply('Подписаться на оповещение о новом блоке ethereum?', {
+  ctx.reply('Подписаться на оповещение о новом блоке Ethereum?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
       { text: "Да", callback_data: 'subBlockEth' }, 
@@ -121,17 +123,18 @@ subscribe.action('chooseEth', (ctx)=>{
 // Обработчик подписки на блок Ethereum -----------------------------------------------------------
 subscribe.action('subBlockEth',  (ctx)=>{
   ctx.wizard.state.block = 'да'
-  ctx.reply('Введите ethereum кошелек:');
+  ctx.reply('Введите Ethereum кошелек:');
 });
 // Обработчик подписки на блок Ethereum -----------------------------------------------------------
 subscribe.action('notSubBlockEth',  (ctx)=>{
   ctx.wizard.state.block = 'нет'
-  ctx.reply('Введите ethereum кошелек:');
+  ctx.reply('Введите Ethereum кошелек:');
 });
+// Ergo -------------------------------------------------------------------------------------------
 // Обработчик выбра монеты Ergo -------------------------------------------------------------------
 subscribe.action('chooseErgo',  (ctx)=>{
   ctx.wizard.state.poolId = 'ergopool'
-  ctx.reply('Подписаться на оповещение о новом блоке ergo?', {
+  ctx.reply('Подписаться на оповещение о новом блоке Ergo?', {
     parse_mode: 'HTML',
     ...Markup.inlineKeyboard([
       { text: "Да", callback_data: 'subBlockErgo' }, 
@@ -142,13 +145,36 @@ subscribe.action('chooseErgo',  (ctx)=>{
 // Обработчик подписки на блок Ergo ---------------------------------------------------------------
 subscribe.action('subBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'да'
-  ctx.reply('Введите ergo кошелек:');
+  ctx.reply('Введите Ergo кошелек:');
 });
 // Обработчик подписки на блок Ergo ---------------------------------------------------------------
 subscribe.action('notSubBlockErgo',  (ctx)=>{
   ctx.wizard.state.block = 'нет'
-  ctx.reply('Введите ergo кошелек:');
+  ctx.reply('Введите Ergo кошелек:');
 });
+// Vertcoin ---------------------------------------------------------------------------------------
+// Обработчик выбра монеты Vertcoin ---------------------------------------------------------------
+subscribe.action('chooseVert', (ctx)=>{
+  ctx.wizard.state.poolId = 'vtcpool';
+  ctx.reply('Подписаться на оповещение о новом блоке Vertcoin?', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      { text: "Да", callback_data: 'subBlockVert' }, 
+      { text: "Нет", callback_data: 'notSubBlockVert' }
+    ])
+  }) 
+});
+// Обработчик подписки на блок Vertcoin -----------------------------------------------------------
+subscribe.action('subBlockVert',  (ctx)=>{
+  ctx.wizard.state.block = 'да'
+  ctx.reply('Введите Vertcoin кошелек:');
+});
+// Обработчик подписки на блок Vertcoin -----------------------------------------------------------
+subscribe.action('notSubBlockVert',  (ctx)=>{
+  ctx.wizard.state.block = 'нет'
+  ctx.reply('Введите Vertcoin кошелек:');
+});
+//-------------------------------------------------------------------------------------------------
 // Обработчики выбора единиц измерения ------------------------------------------------------------
 subscribe.action('chooseK',  (ctx)=>{
   ctx.wizard.state.stepError = false;
@@ -179,10 +205,10 @@ subscribe.action('chooseP',  (ctx)=>{
 subscribe.action('subHash', (ctx)=>{
   ctx.reply('Вы подписаны на оповещение о хешрейте!')
   let curUser = {
-    userId: ctx.chat.id,
+    userId : ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
     wallet : ctx.wizard.state.wallet,
-    block : ctx.wizard.state.block, 
+    block  : ctx.wizard.state.block, 
     workers : [ctx.wizard.state.worker]
   };
   users.push(curUser);
