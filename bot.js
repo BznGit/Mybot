@@ -145,6 +145,7 @@ function getBlock(){
 // Проверка хешрета воркеров ----------------------------------------------------------------------
 function  getHash(){
   users.forEach(item =>{
+    if(item.wallet==null && item.workers==null) return
     axios({
       url: api2 + '/api/pools/' + item.poolId + '/miners/' + item.wallet,
       method: 'get',

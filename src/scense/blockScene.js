@@ -15,23 +15,57 @@ const onBlock = new Scenes.WizardScene(
     ctx.reply('Выберите одну из монет пула:', {
       parse_mode: 'HTML',
       ...Markup.inlineKeyboard([
-        Markup.button.callback ('Ethereum','chooseEth'),
-        Markup.button.callback('Ergo', 'chooseErgo'),
-        Markup.button.callback('Vertcoin', 'chooseVert'),              
+        { text: 'Ethereum', callback_data: 'chooseEth'}, 
+        { text: 'Ergo', callback_data: 'chooseErgo' },  
+        { text: 'Vertcoin', callback_data: 'chooseVert' }           
       ])    
     })
     return ctx.wizard.next(); 
   },
-);  
+);
+// Ethereum ---------------------------------------------------------------------------------------
+// Обработчик выбра монеты Ethereum ---------------------------------------------------------------
+onBlock.action('chooseEth', (ctx)=>{
+  ctx.wizard.state.poolId = 'ethpool';
+  ctx.reply('Подписаться на оповещение о новом блоке Ethereum?', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      { text: "Да", callback_data: 'subBlock' }, 
+      { text: "Нет", callback_data: 'back' }
+    ])
+  }) 
+});
+// Обработчик выбра монеты Ergo -------------------------------------------------------------------
+onBlock.action('chooseErgo',  (ctx)=>{
+  ctx.wizard.state.poolId = 'ergopool'
+  ctx.reply('Подписаться на оповещение о новом блоке Ergo?', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      { text: "Да", callback_data: 'subBlock' }, 
+      { text: "Нет", callback_data: 'back' }
+    ])
+  }) 
+});
+// Обработчик выбра монеты Vertcoin ---------------------------------------------------------------
+onBlock.action('chooseVert', (ctx)=>{
+  ctx.wizard.state.poolId = 'vtcpool';
+  ctx.reply('Подписаться на оповещение о новом блоке Vertcoin?', {
+    parse_mode: 'HTML',
+    ...Markup.inlineKeyboard([
+      { text: "Да", callback_data: 'subBlock' }, 
+      { text: "Нет", callback_data: 'back' }
+    ])
+  }) 
+});
 // Обработчик добавления пользователя -------------------------------------------------------------
-onBlock.action('subHash', (ctx)=>{
+onBlock.action('subBlock', (ctx)=>{
   ctx.reply('Вы подписаны на оповещение о хешрейте!')
   let curUser = {
     userId : ctx.chat.id,
     poolId : ctx.wizard.state.poolId,
-    wallet : ctx.wizard.state.wallet,
-    block  : ctx.wizard.state.block, 
-    workers : [ctx.wizard.state.worker]
+    block  : 'да',
+    wallet : null, 
+    workers : null
   };
   users.push(curUser);
   //Запись данных пользователя в файл -------------------------------------------------------------

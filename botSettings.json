@@ -4,5 +4,5 @@
     "monitoringPeriodSec": "10",
     "adminId":"886960493", 
     "wellcomeText":"Добро пожаловать в чат-бот поддержки пользователей\n <b>ETHCORE MINING POOL</b>\nДля начала работы с ботом нажмите «Продолжить»",
-    "eventsLoger": true
+    "eventsLoger": false
 }

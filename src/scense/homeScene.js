@@ -9,12 +9,13 @@ const home = new Scenes.WizardScene(
   // Шаг 1: Получение исходных данных пользователя ------------------------------------------------
   (ctx)=>{
     let currUser = users.find(item=>item.userId == ctx.chat.id);
+    
     if (currUser == undefined){
-      try{
-          return  ctx.reply('Сейчас у Вас нет подписки на оповещение о появлении нового блока и падении текущего хешрейта воркеров', {
+      if (ctx.chat.type =='group'){
+        try{
+          return  ctx.reply('Сейчас у Вас нет подписки на оповещение о появлении нового блока', {
                     parse_mode: 'HTML',
                     ...Markup.inlineKeyboard([
-                       Markup.button.callback('Подписаться на оповещение о хешрейте', 'onSub'),
                        Markup.button.callback('Подписаться на оповещение о новом блоке', 'blockSub'),       
                     ])
                   })
@@ -22,30 +23,68 @@ const home = new Scenes.WizardScene(
         console.log('Error sending message to user! HomeScene.js line 20', err);
         logIt('Error sending message to user! HomeScene.js line 20', err);
       }
-    }
-    else
-    {
-      let text='';
-      let item = currUser.workers
-      for(let i=0; i<item.length; i++){
-        text += `${i+1}) «`+ `${item[i].name ==''? 'default': item[i].name}` +'» : ограничение - ' + item[i].hashLevel +' '+ item[i].hashDev + `, оповещение: «${item[i].delivered? 'отключено':'включено'}` + '»;\n'
-      }
-      try{
-        ctx.reply('<u>Вы подписаны на оповещение с параметрами:</u>\n' +
-          '<b>- монета: </b>'   + currUser.poolId  + ';\n' +
-          '<b>- оповещение о новом блоке: </b>«'  + currUser.block + '»;\n' +
-          '<b>- кошелек: </b>'  + currUser.wallet + ';\n' +
-          '<b>- контролируемые воркеры: </b>\n'  + text + 
-          'Выберите:',  {
-            parse_mode: 'HTML',
-            ...Markup.inlineKeyboard([
-                [{ text: "Отписаться от оповещения", callback_data: "unSub" },{ text: "Изменить параметры оповещения", callback_data: "chengeSub" }],
-                [{ text: "Назад", callback_data: "back" }], 
-              ])
-          });       
+      }else{
+        try{
+          return  ctx.reply('Сейчас у Вас нет подписки на оповещение о появлении нового блока и падении текущего хешрейта воркеров', {
+                    parse_mode: 'HTML',
+                    ...Markup.inlineKeyboard([
+                       Markup.button.callback('Подписаться на оповещение о хешрейте', 'onSub'),
+                       Markup.button.callback('Подписаться на оповещение о блоке', 'blockSub'),       
+                    ])
+                  })
       }catch(err){
-        console.log('Error getting user info: homeScene.js line 45 ', err);
-        logIt('Error getting user info: homeScene.js line 45', err);
+        console.log('Error sending message to user! HomeScene.js line 20', err);
+        logIt('Error sending message to user! HomeScene.js line 20', err);
+      }
+      }
+      
+    }
+    else {
+      if(currUser.wallet==null && currUser.workers==null){
+        try{
+          let coin = null;
+          switch (currUser.poolId){
+            case 'ethpool' : coin ='Ethereum';
+                break;
+            case 'ergopool' : coin ='Ergo';
+              break;
+            case 'vtcpool' : coin ='Vertcoin';
+              break;
+          }
+          ctx.reply('Вы подписаны на оповещение о новом блоке монеты <b>' + coin + '</b>',
+              { parse_mode: 'HTML',
+                ...Markup.inlineKeyboard([
+                { text: "Отписаться от оповещения", callback_data: "unSub" },
+                { text: "Нет", callback_data: "back" }, 
+              ])
+            });       
+        }catch(err){
+          console.log('Error getting user info: homeScene.js line 62 ', err);
+          logIt('Error getting user info: homeScene.js line 62', err);
+        }
+      }else{
+        let text='';
+        let item = currUser.workers
+        for(let i=0; i<item.length; i++){
+          text += `${i+1}) «`+ `${item[i].name ==''? 'default': item[i].name}` +'» : ограничение - ' + item[i].hashLevel +' '+ item[i].hashDev + `, оповещение: «${item[i].delivered? 'отключено':'включено'}` + '»;\n'
+        }
+        try{
+          ctx.reply('<u>Вы подписаны на оповещение с параметрами:</u>\n' +
+            '<b>- монета: </b>'   + currUser.poolId  + ';\n' +
+            '<b>- оповещение о новом блоке: </b>«'  + currUser.block + '»;\n' +
+            '<b>- кошелек: </b>'  + currUser.wallet + ';\n' +
+            '<b>- контролируемые воркеры: </b>\n'  + text + 
+            'Выберите:',  {
+              parse_mode: 'HTML',
+              ...Markup.inlineKeyboard([
+                  [{ text: "Отписаться от оповещения", callback_data: "unSub" },{ text: "Изменить параметры оповещения", callback_data: "chengeSub" }],
+                  [{ text: "Назад", callback_data: "back" }], 
+                ])
+            });       
+        }catch(err){
+          console.log('Error getting user info: homeScene.js line 45 ', err);
+          logIt('Error getting user info: homeScene.js line 45', err);
+        }
       }
     } 
 });
